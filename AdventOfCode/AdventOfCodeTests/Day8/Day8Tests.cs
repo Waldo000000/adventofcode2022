@@ -23,6 +23,12 @@ public class Day8Tests
         Day8Puzzle.CountVisibleTrees(treeMap).Should().Be(9);
     }
 
+    [Test] public void CountVisibleTrees_WithRealData_ReturnsExpectedResult()
+    {
+        var treeMap = ReadTreeMap("Day8\\Part1.real.txt");
+        Day8Puzzle.CountVisibleTrees(treeMap).Should().Be(1803);
+    }
+
     private static TreeMap ReadTreeMap(string inputFilepath)
     {
         IEnumerable<string> lines = File.ReadAllLines(inputFilepath);
