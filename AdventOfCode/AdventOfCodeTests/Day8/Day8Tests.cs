@@ -12,18 +12,30 @@ public class Day8Tests
     [Test]
     public void CountVisibleTrees_WithSampleData_ReturnsExpectedResult()
     {
-        var treeMap = ReadTreeMap("Day1\\Part1.sample.txt");
+        var treeMap = ReadTreeMap("Day8\\Part1.sample.txt");
         Day8Puzzle.CountVisibleTrees(treeMap).Should().Be(21);
+    }
+    
+    [Test]
+    public void CountVisibleTrees_WithOtherData_ReturnsExpectedResult()
+    {
+        var treeMap = ReadTreeMap("Day8\\Part1.other.txt");
+        Day8Puzzle.CountVisibleTrees(treeMap).Should().Be(9);
     }
 
     private static TreeMap ReadTreeMap(string inputFilepath)
     {
         IEnumerable<string> lines = File.ReadAllLines(inputFilepath);
-        var rows = lines.Select(line => line.Split()).Select(chars => chars.Select(int.Parse).Select(AsTree).ToArray()).ToArray();
+        var rows = lines.Select(line => line.ToCharArray()).Select(chars => chars.Select(CharToInt).Select(CreateTreeWithHeight).ToArray()).ToArray();
         return new TreeMap(rows);
     }
 
-    private static Tree AsTree(int height)
+    private static int CharToInt(char ch)
+    {
+        return int.Parse(ch.ToString());
+    }
+
+    private static Tree CreateTreeWithHeight(int height)
     {
         return new Tree(height);
     }
