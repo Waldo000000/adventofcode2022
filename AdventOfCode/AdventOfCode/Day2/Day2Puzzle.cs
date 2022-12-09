@@ -6,15 +6,25 @@ namespace AdventOfCode.Day2;
 
 public static class Day2Puzzle
 {
-    private static readonly Dictionary<string, HandShape> StrategyCipher = new()
+    private static readonly Dictionary<string, HandShape> StrategyCipherForPlayerHandShape = new()
     {
-        {"A", HandShape.Rock},
-        {"B", HandShape.Paper},
-        {"C", HandShape.Scissors},
-
         {"X", HandShape.Rock},
         {"Y", HandShape.Paper},
         {"Z", HandShape.Scissors},
+    };
+
+    private static readonly Dictionary<string, HandShape> StrategyCipherForOpponentHandShape = new()
+    {
+        {"A", HandShape.Rock},
+        {"B", HandShape.Paper},
+        {"C", HandShape.Scissors}
+    };
+
+    private static readonly Dictionary<string, Outcome> StrategyCipherForPlayerOutcome = new()
+    {
+        {"X", Outcome.Loss},
+        {"Y", Outcome.Draw},
+        {"Z", Outcome.Win},
     };
 
     private static readonly Dictionary<HandShape, int> HandShapeScore = new()
@@ -57,12 +67,28 @@ public static class Day2Puzzle
         return strategyGuide.Turns.Sum(turn => OutcomeScore[GetOutcome(turn)] + HandShapeScore[turn.PlayerTurn]);
     }
 
-    public static StrategyGuide DecryptStrategyGuide(IEnumerable<string> lines)
+    public static StrategyGuide DecryptStrategyGuideFromHandShapeGuide(IEnumerable<string> lines)
     {
         var turns = lines.Select(line =>
         {
             var tokens = line.Split(" ");
-            return new Turn(StrategyCipher[tokens[0]], StrategyCipher[tokens[1]]);
+            return new Turn(StrategyCipherForOpponentHandShape[tokens[0]], StrategyCipherForPlayerHandShape[tokens[1]]);
+        }).ToList();
+        return new StrategyGuide(turns);
+    }
+
+    public static StrategyGuide DecryptStrategyGuideFromOutcomeGuide(IEnumerable<string> lines)
+    {
+        var turns = lines.Select(line =>
+        {
+            var tokens = line.Split(" ");
+            var opponentTurn = StrategyCipherForOpponentHandShape[tokens[0]];
+            var playerOutcome = StrategyCipherForPlayerOutcome[tokens[1]];
+            var playerTurn = PlayerVsOpponentOutcomes
+                .SelectMany(playerTurnMap => playerTurnMap.Value.Where(opponentTurnMap =>
+                    opponentTurnMap.Key == opponentTurn && opponentTurnMap.Value == playerOutcome).Select(_ => playerTurnMap.Key)).Single();
+
+            return new Turn(opponentTurn, playerTurn);
         }).ToList();
         return new StrategyGuide(turns);
     }
