@@ -34,6 +34,12 @@ public class Day8Tests
         var treeMap = ReadTreeMap("Day8\\Part2.sample.txt");
         Day8Puzzle.GetMaxScenicScore(treeMap).Should().Be(8);
     }
+    
+    [Test] public void GetScenicScore_WithRealData_ReturnsExpectedResult()
+    {
+        var treeMap = ReadTreeMap("Day8\\Part2.real.txt");
+        Day8Puzzle.GetMaxScenicScore(treeMap).Should().Be(268912);
+    }
 
     private static TreeMap ReadTreeMap(string inputFilepath)
     {
