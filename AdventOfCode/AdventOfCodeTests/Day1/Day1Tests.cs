@@ -30,6 +30,14 @@ public class Day1Tests
         var maxCaloriesFromTopNElves = Day1Puzzle.GetMaxCaloriesFromTopNElves(elves.ToList(), 3);
         maxCaloriesFromTopNElves.Should().Be(45000);
     }
+    
+    [Test]
+    public void GetMaxCaloriesFromTopNElves_WithRealData_ReturnsExpectedValue()
+    {
+        var elves = ReadElves("Day1\\Part2.real.txt");
+        var maxCaloriesFromTopNElves = Day1Puzzle.GetMaxCaloriesFromTopNElves(elves.ToList(), 3);
+        maxCaloriesFromTopNElves.Should().Be(208180);
+    }
 
     private static IEnumerable<Elf> ReadElves(string inputFilepath)
     {
