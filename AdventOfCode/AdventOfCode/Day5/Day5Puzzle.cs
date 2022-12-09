@@ -5,7 +5,7 @@ namespace AdventOfCode.Day5;
 
 public static class Day5Puzzle
 {
-    public static void RearrangeStacks(Stack<string>[] stacks, RearrangementProcedure rearrangementProcedure)
+    public static void RearrangeStacksWithCrateMover9000(Stack<string>[] stacks, RearrangementProcedure rearrangementProcedure)
     {
         foreach (var movementOperation in rearrangementProcedure.MovementOperations)
         {
@@ -14,6 +14,15 @@ public static class Day5Puzzle
                 var popped = stacks[movementOperation.FromStack-1].Pop();
                 stacks[movementOperation.ToStack-1].Push(popped);
             });
+        }
+    }
+
+    public static void RearrangeStacksWithCrateMover9001(Stack<string>[] stacks, RearrangementProcedure rearrangementProcedure)
+    {
+        foreach (var movementOperation in rearrangementProcedure.MovementOperations)
+        {
+            var popped = Enumerable.Range(0, movementOperation.NumCrates).Select(_ => stacks[movementOperation.FromStack - 1].Pop());
+            popped.Reverse().ToList().ForEach(crate => stacks[movementOperation.ToStack - 1].Push(crate));
         }
     }
 

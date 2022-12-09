@@ -16,19 +16,35 @@ public class Day5Tests
     private static readonly Regex MovementOperationRegex = new Regex(@"^move (\d*) from (\d*) to (\d*)$");
 
     [Test]
-    public void GetStackTopsAfterRearrangement_WithSampleData_ReturnsExpectedResult()
+    public void GetStackTopsAfterRearrangementWithCrateMover9000_WithSampleData_ReturnsExpectedResult()
     {
         var (stacks, rearrangementProcedure) = ReadRearrangementProcedure("Day5\\Part1.sample.txt");
-        Day5Puzzle.RearrangeStacks(stacks, rearrangementProcedure);
+        Day5Puzzle.RearrangeStacksWithCrateMover9000(stacks, rearrangementProcedure);
         Day5Puzzle.GetStackTopSummary(stacks).Should().Be("CMZ");
     }
     
     [Test]
-    public void GetStackTopsAfterRearrangement_WithRealData_ReturnsExpectedResult()
+    public void GetStackTopsAfterRearrangementWithCrateMover9000_WithRealData_ReturnsExpectedResult()
     {
         var (stacks, rearrangementProcedure) = ReadRearrangementProcedure("Day5\\Part1.real.txt");
-        Day5Puzzle.RearrangeStacks(stacks, rearrangementProcedure);
+        Day5Puzzle.RearrangeStacksWithCrateMover9000(stacks, rearrangementProcedure);
         Day5Puzzle.GetStackTopSummary(stacks).Should().Be("ZSQVCCJLL");
+    }
+    
+    [Test]
+    public void GetStackTopsAfterRearrangementWithCrateMover9001_WithSampleData_ReturnsExpectedResult()
+    {
+        var (stacks, rearrangementProcedure) = ReadRearrangementProcedure("Day5\\Part1.sample.txt");
+        Day5Puzzle.RearrangeStacksWithCrateMover9001(stacks, rearrangementProcedure);
+        Day5Puzzle.GetStackTopSummary(stacks).Should().Be("MCD");
+    }
+    
+    [Test]
+    public void GetStackTopsAfterRearrangementWithCrateMover9001_WithRealData_ReturnsExpectedResult()
+    {
+        var (stacks, rearrangementProcedure) = ReadRearrangementProcedure("Day5\\Part1.real.txt");
+        Day5Puzzle.RearrangeStacksWithCrateMover9001(stacks, rearrangementProcedure);
+        Day5Puzzle.GetStackTopSummary(stacks).Should().Be("QZFJRWHGS");
     }
 
     private static (Stack<string>[], RearrangementProcedure) ReadRearrangementProcedure(string inputFilepath)
