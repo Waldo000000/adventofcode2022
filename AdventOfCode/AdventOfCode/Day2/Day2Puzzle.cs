@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -16,9 +17,44 @@ public static class Day2Puzzle
         {"Z", HandShape.Scissors},
     };
 
+    private static readonly Dictionary<HandShape, int> HandShapeScore = new()
+    {
+        {HandShape.Rock, 1},
+        {HandShape.Paper, 2},
+        {HandShape.Scissors, 3}
+    };
+
+    private static readonly Dictionary<Outcome, int> OutcomeScore = new()
+    {
+        {Outcome.Loss, 0},
+        {Outcome.Draw, 3},
+        {Outcome.Win, 6}
+    };
+
+    private static readonly Dictionary<HandShape, Dictionary<HandShape, Outcome>> PlayerVsOpponentOutcomes = new()
+    {
+        {
+            HandShape.Rock,
+            new() {{HandShape.Rock, Outcome.Draw}, {HandShape.Paper, Outcome.Loss}, {HandShape.Scissors, Outcome.Win}}
+        },
+        {
+            HandShape.Paper,
+            new() {{HandShape.Paper, Outcome.Draw}, {HandShape.Scissors, Outcome.Loss}, {HandShape.Rock, Outcome.Win}}
+        },
+        {
+            HandShape.Scissors,
+            new() {{HandShape.Scissors, Outcome.Draw}, {HandShape.Rock, Outcome.Loss}, {HandShape.Paper, Outcome.Win}}
+        },
+    };
+
+    private static Outcome GetOutcome(Turn turn)
+    {
+        return PlayerVsOpponentOutcomes[turn.PlayerTurn][turn.OpponentTurn];
+    }
+
     public static int GetTotalScore(StrategyGuide strategyGuide)
     {
-        return 0;
+        return strategyGuide.Turns.Sum(turn => OutcomeScore[GetOutcome(turn)] + HandShapeScore[turn.PlayerTurn]);
     }
 
     public static StrategyGuide DecryptStrategyGuide(IEnumerable<string> lines)
@@ -41,4 +77,11 @@ public enum HandShape
     Rock,
     Paper,
     Scissors
+}
+
+public enum Outcome
+{
+    Loss,
+    Draw,
+    Win
 }
