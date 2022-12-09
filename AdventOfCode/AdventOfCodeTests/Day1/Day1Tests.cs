@@ -10,6 +10,13 @@ namespace AdventOfCodeTests.Day1;
 public class Day1Tests
 {
     [Test]
+    public void GetMaxCaloriesFromOneElf_WithSampleData_ReturnsExpectedValue()
+    {
+        var elves = ReadElves("Day1\\Part1.sample.txt");
+        Day1Puzzle.GetMaxCaloriesFromTopElves(elves.ToList()).Should().Be(3000);
+    }
+    
+    [Test]
     public void GetMaxCaloriesFromOneElf_WithRealData_ReturnsExpectedValue()
     {
         Day1Puzzle.GetMaxCaloriesFromOneElf(elves.ToList()).Should().Be(69912);
@@ -48,6 +55,9 @@ public class Day1Tests
 
             linesInGroup.Add(line);
         }
+        
+        if (linesInGroup.Any())
+            groups.Add(linesInGroup);
 
         return groups;
     }
