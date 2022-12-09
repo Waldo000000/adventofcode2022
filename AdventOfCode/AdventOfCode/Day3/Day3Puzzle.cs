@@ -5,7 +5,14 @@ namespace AdventOfCode.Day3;
 
 public static class Day3Puzzle
 {
-    private const string ItemChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    private const string ItemNames = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    private static Item[] AllItems => ItemNames.Select(n => new Item(n.ToString())).ToArray();
+
+    private static int GetItemPriority(Item item)
+    {
+        return ItemNames.IndexOf(item.Name, StringComparison.Ordinal) + 1;
+    }
 
     public static int GetSumOfPackingErrorPriorities(Rucksack[] rucksacks)
     {
@@ -17,20 +24,29 @@ public static class Day3Puzzle
         return GetItemPriority(GetPackingErrorItem(rucksack));
     }
 
-    private static string GetPackingErrorItem(Rucksack rucksack)
+    private static Item GetPackingErrorItem(Rucksack rucksack)
     {
-        var allNames = rucksack.Compartments.SelectMany(c => c.Items).Select(item => item.Name).Distinct();
-        var errorItems = allNames.Where(name => rucksack.Compartments.Count(c => c.Items.Any(i => i.Name == name)) > 1);
+        var errorItems = AllItems.Where(item => rucksack.Compartments.Count(c => c.Items.Contains(item)) > 1);
         return errorItems.Single();
     }
 
-    private static int GetItemPriority(string item)
+    public static int GetSumOfBadgePriorities(Rucksack[] rucksacks)
     {
-        return ItemChars.IndexOf(item, StringComparison.Ordinal) + 1;
+        return rucksacks.Chunk(3)
+            .Select(GetBadge)
+            .Sum(GetItemPriority);
+    }
+
+    private static Item GetBadge(Rucksack[] group)
+    {
+        return AllItems.Single(item => group.All(g => g.Items.Contains(item)));
     }
 }
 
-public record Rucksack(Compartment[] Compartments);
+public record Rucksack(Compartment[] Compartments)
+{
+    public readonly Item[] Items = Compartments.SelectMany(c => c.Items).ToArray();
+};
 
 public record Compartment(Item[] Items);
 

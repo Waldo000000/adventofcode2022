@@ -22,6 +22,20 @@ public class Day3Tests
         var rucksacks = ReadRucksacks("Day3\\Part1.real.txt");
         Day3Puzzle.GetSumOfPackingErrorPriorities(rucksacks).Should().Be(7872);
     }
+
+    [Test]
+    public void GetSumOfBadgePriorities_WithSampleData_ReturnsExpectedResult()
+    {
+        var rucksacks = ReadRucksacks("Day3\\Part1.sample.txt");
+        Day3Puzzle.GetSumOfBadgePriorities(rucksacks).Should().Be(70);
+    }
+
+    [Test]
+    public void GetSumOfBadgePriorities_WithRealData_ReturnsExpectedResult()
+    {
+        var rucksacks = ReadRucksacks("Day3\\Part1.real.txt");
+        Day3Puzzle.GetSumOfBadgePriorities(rucksacks).Should().Be(2497);
+    }
     
     private static Rucksack[] ReadRucksacks(string inputFilepath)
     {
