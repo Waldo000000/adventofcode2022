@@ -1,11 +1,59 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Schema;
 
 namespace AdventOfCode.Day8;
 
 public static class Day8Puzzle
 {
+    public static int GetMaxScenicScore(TreeMap treeMap)
+    {
+        return GetScenicScores(treeMap).Max(row => row.Max());
+    }
+
+    private static int[][] GetScenicScores(TreeMap treeMap)
+    {
+        var numRows = treeMap.Rows.Length;
+        var numCols = treeMap.Rows.First().Length;
+        int[][] result = new int[numRows][];
+
+        for (int rowIdx = 0; rowIdx < numRows; rowIdx++)
+        {
+            result[rowIdx] = new int[numCols];
+
+            for (int colIdx = 0; colIdx < numCols; colIdx++)
+            {
+                result[rowIdx][colIdx] = GetScenicScore(treeMap, rowIdx, colIdx);
+            }
+        }
+
+        return result;
+    }
+
+    private static int GetScenicScore(TreeMap treeMap, int rowIdx, int colIdx)
+    {
+        var maxRowIdx = treeMap.Rows.Length - 1;
+        var maxColIdx = treeMap.Rows.First().Length - 1;
+        var scenicScoreLookingRight = GetScenicScoreLookingRight(treeMap.Rows, rowIdx, colIdx);
+        var scenicScoreLookingLeft = GetScenicScoreLookingRight(treeMap.Rows.Select(row => row.Reverse().ToArray()).ToArray(), rowIdx, maxColIdx - colIdx);
+        
+        var scenicScoreLookingDown = GetScenicScoreLookingRight(treeMap.Rows.Transpose(), colIdx, rowIdx);
+        var scenicScoreLookingUp = GetScenicScoreLookingRight(treeMap.Rows.Transpose().Select(row => row.Reverse().ToArray()).ToArray(), colIdx, maxRowIdx - rowIdx);
+
+        return scenicScoreLookingRight * scenicScoreLookingLeft * scenicScoreLookingDown * scenicScoreLookingUp;
+    }
+
+    private static int GetScenicScoreLookingRight(Tree[][] treeMap, int rowIdx, int colIdx)
+    {
+        var treeHeight = treeMap[rowIdx][colIdx];
+        var scenicScoreLookingRight = treeMap[rowIdx].Skip(colIdx + 1).TakeWhile(col => treeHeight.Height > col.Height).Count();
+        var numCols = treeMap.First().Length;
+        return colIdx + scenicScoreLookingRight < numCols - 1
+            ? scenicScoreLookingRight + 1 // add the tree that was at equal height
+            : scenicScoreLookingRight;
+    }
+
     public static int CountVisibleTrees(TreeMap treeMap)
     {
         var visibilityFromLeft = treeMap.Rows.Select(GetVisibilityFromLeft).ToArray();
@@ -28,7 +76,7 @@ public static class Day8Puzzle
         {
             for (int colIdx = 0; colIdx < numCols; colIdx++)
             {
-                 result[rowIdx, colIdx] = masks.Select(mask => mask[rowIdx][colIdx]).Any(v => v == true);
+                 result[rowIdx, colIdx] = masks.Select(mask => mask[rowIdx][colIdx]).Any(v => v);
             }
         }
 
