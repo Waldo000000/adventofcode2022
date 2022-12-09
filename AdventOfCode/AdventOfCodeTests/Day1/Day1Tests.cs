@@ -12,8 +12,8 @@ public class Day1Tests
     [Test]
     public void GetMaxCaloriesFromOneElf_WithRealData_ReturnsExpectedValue()
     {
-        var elves = ReadElves("Day1\\input.txt");
         Day1Puzzle.GetMaxCaloriesFromOneElf(elves.ToList()).Should().Be(69912);
+        var elves = ReadElves("Day1\\Part1.real.txt");
     }
 
     private static IEnumerable<Elf> ReadElves(string inputFilepath)
