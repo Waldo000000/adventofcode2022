@@ -16,6 +16,13 @@ public class Day2Tests
         Day2Puzzle.GetTotalScore(strategyGuide).Should().Be(15);
     }
     
+    [Test]
+    public void GetTotalScore_WithRealData_ReturnsExpectedResult()
+    {
+        var strategyGuide = ReadStrategyGuide("Day2\\Part1.real.txt");
+        Day2Puzzle.GetTotalScore(strategyGuide).Should().Be(10994);
+    }
+    
     private static StrategyGuide ReadStrategyGuide(string inputFilepath)
     {
         IEnumerable<string> lines = File.ReadAllLines(inputFilepath);
