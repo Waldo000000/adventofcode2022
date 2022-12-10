@@ -11,20 +11,34 @@ namespace AdventOfCodeTests.Day9;
 public class Day9Tests
 {
     [Test]
-    public void GetNumberOfUniqueTailPositions_WithSampleData_ReturnsExpectedResult()
+    public void GetNumberOfUniqueTailPositions_WithTwoKnotsWithSampleData_ReturnsExpectedResult()
     {
-        var motions = ReadTreeMap("Day9\\Part1.sample.txt");
-        Day9Puzzle.GetNumberOfUniqueTailPositions(motions).Should().Be(13);
+        var motions = ReadMotions("Day9\\Part1.sample.txt");
+        Day9Puzzle.GetNumberOfUniqueTailPositions(motions, new Rope()).Should().Be(13);
     }
 
     [Test]
-    public void GetNumberOfUniqueTailPositions_WithRealData_ReturnsExpectedResult()
+    public void GetNumberOfUniqueTailPositions_WithTwoKnotsWithRealData_ReturnsExpectedResult()
     {
-        var motions = ReadTreeMap("Day9\\Part1.real.txt");
-        Day9Puzzle.GetNumberOfUniqueTailPositions(motions).Should().Be(6311);
+        var motions = ReadMotions("Day9\\Part1.real.txt");
+        Day9Puzzle.GetNumberOfUniqueTailPositions(motions, new Rope()).Should().Be(6311);
     }
 
-    private static Motion[] ReadTreeMap(string inputFilepath)
+    [Test]
+    public void GetNumberOfUniqueTailPositions_WithTenKnotsWithPart1SampleData_ReturnsExpectedResult()
+    {
+        var motions = ReadMotions("Day9\\Part1.sample.txt");
+        Day9Puzzle.GetNumberOfUniqueTailPositions(motions, new Rope()).Should().Be(1);
+    }
+    
+    [Test]
+    public void GetNumberOfUniqueTailPositions_WithTenKnotsWithPart2SampleData_ReturnsExpectedResult()
+    {
+        var motions = ReadMotions("Day9\\Part2.sample.txt");
+        Day9Puzzle.GetNumberOfUniqueTailPositions(motions, new Rope()).Should().Be(36);
+    }
+
+    private static Motion[] ReadMotions(string inputFilepath)
     {
         IEnumerable<string> lines = File.ReadAllLines(inputFilepath);
         return lines.Select(ParseMotion).ToArray();

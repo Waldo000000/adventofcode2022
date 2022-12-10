@@ -6,9 +6,8 @@ namespace AdventOfCode.Day9;
 
 public static class Day9Puzzle
 {
-    public static int GetNumberOfUniqueTailPositions(Motion[] motions)
+    public static int GetNumberOfUniqueTailPositions(Motion[] motions, Rope rope)
     {
-        var rope = new Rope();
         var tailPositions = new HashSet<Coord>();
         motions.ToList().ForEach(motion =>
         {
