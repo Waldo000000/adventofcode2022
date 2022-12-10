@@ -29,7 +29,21 @@ public class Day7Tests
     public void GetSumOfSizesOfDirectories_WithMaxSize100000AndRealData_ReturnsExpectedResult()
     {
         var terminalOutput = ParseTerminalOutput("Day7\\Part1.real.txt").ToArray();
-        Day7Puzzle.GetSumOfSizesOfDirectories(terminalOutput, 100000).Should().Be(95437);
+        Day7Puzzle.GetSumOfSizesOfDirectories(terminalOutput, 100000).Should().Be(1086293);
+    }
+    
+    [Test]
+    public void GetSizeOfSmallestDirectoryBigEnoughToFreeSpace_WithMaxUsedAfterDelete40000000AndSampleData_ReturnsExpectedResult()
+    {
+        var terminalOutput = ParseTerminalOutput("Day7\\Part1.sample.txt").ToArray();
+        Day7Puzzle.GetSizeOfSmallestDirectoryBigEnoughToFreeSpace(terminalOutput, 40000000).Should().Be(24933642);
+    }
+    
+    [Test]
+    public void GetSizeOfSmallestDirectoryBigEnoughToFreeSpace_WithMaxUsedAfterDelete40000000AndRealData_ReturnsExpectedResult()
+    {
+        var terminalOutput = ParseTerminalOutput("Day7\\Part1.real.txt").ToArray();
+        Day7Puzzle.GetSizeOfSmallestDirectoryBigEnoughToFreeSpace(terminalOutput, 40000000).Should().Be(-1);
     }
 
     private static IEnumerable<Command> ParseTerminalOutput(string filename)

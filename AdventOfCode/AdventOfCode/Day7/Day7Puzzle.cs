@@ -22,6 +22,27 @@ public class Day7Puzzle
         )).Sum(size => size <= maxDirectorySizeToSum ? size : 0);
     }
 
+    public static int GetSizeOfSmallestDirectoryBigEnoughToFreeSpace(Command[] commands, int maxUsedAfterDelete)
+    {
+        var state = new State(new Directory("/", null));
+        commands.ToList().ForEach(command => ProcessCommand(command, state));
+
+        var totalCurrentUsed = TreeAggregate(
+            state.RootDirectory,
+            dir => dir.Directories,
+            dir => dir.Files.Sum(f => f.Size)
+        );
+
+        var directorySizes = GetAllDirectories(state.RootDirectory).Select(directory => TreeAggregate(
+            directory,
+            dir => dir.Directories,
+            dir => dir.Files.Sum(f => f.Size)
+        )).ToList();
+        
+        var needToDelete = totalCurrentUsed - maxUsedAfterDelete;
+        return directorySizes.OrderBy(s => s).First(s => s >= needToDelete);
+    }
+
     private static IEnumerable<Directory> GetAllDirectories(Directory directory)
     {
         return new[] {directory}.ToList().Concat(directory.Directories.SelectMany(GetAllDirectories));
