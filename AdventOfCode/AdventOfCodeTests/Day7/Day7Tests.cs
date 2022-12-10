@@ -1,4 +1,4 @@
-﻿using System.IO;
+﻿using System;
 using AdventOfCode.Day7;
 using FluentAssertions;
 using NUnit.Framework;
@@ -11,31 +11,33 @@ public class Day7Tests
     public void GetSumOfSizesOfDirectories_WithMaxSize100000AndSampleData_ReturnsExpectedResult()
     {
         var terminalOutput = ParseTerminalOutput();
-        Day7Puzzle.GetSumOfSizesOfDirectories(terminalOutput).Should().Be(95437);
+        Day7Puzzle.GetSumOfSizesOfDirectories(terminalOutput, 100000).Should().Be(95437);
     }
 
-    private static TerminalOutput ParseTerminalOutput()
+    private static Command[] ParseTerminalOutput()
     {
         // TODO: 
         // var lines = File.ReadAllLines("Day7\\Part1.sample.txt");
         // ...
 
-        var terminalOutput = new TerminalOutput(
-            new TerminalCommandOutput[]
+        return new Command[]
+        {
+            new RootDirectoryCommand(),
+            new ListDirectoryContentsCommand(new[]
+                {
+                    new DirectorySummary("a"),
+                },
+                new[]
+                {
+                    new FileSummary("b.txt", 14848514),
+                    new FileSummary("c.dat", 8504156),
+                }),
+            new RelativeChangeDirectoryCommand("a"),
+            new ListDirectoryContentsCommand(Array.Empty<DirectorySummary>(), new []
             {
-                new ChangeDirectoryTerminalCommandOutput("/"),
-                new ListDirectoryContentsTerminalCommandOutput(new[]
-                    {
-                        new DirectorySummary("a"),
-                        new DirectorySummary("a"),
-                    },
-                    new[]
-                    {
-                        new FileSummary("b.txt", 14848514),
-                        new FileSummary("c.dat", 8504156),
-                    })
-            });
-        return terminalOutput;
+                new FileSummary("x.txt", 90000)
+            })
+        };
     }
 
     [Test]
