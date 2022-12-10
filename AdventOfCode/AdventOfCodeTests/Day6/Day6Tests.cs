@@ -20,4 +20,18 @@ public class Day6Tests
         using StreamReader sr = new StreamReader("Day6\\Part1.real.txt");
         Day6Puzzle.GetCharactersProcessedBeforeStartOfPacketMarker(sr).Should().Be((1987, true));
     }
+    
+    [Test]
+    public void GetCharactersProcessedBeforeStartOfMessageMarker_WithSampleData_ReturnsExpectedResult()
+    {
+        using StreamReader sr = new StreamReader("Day6\\Part1.sample.txt");
+        Day6Puzzle.GetCharactersProcessedBeforeStartOfMessageMarker(sr).Should().Be((19, true));
+    }
+    
+    [Test]
+    public void GetCharactersProcessedBeforeStartOfMessageMarker_WithRealData_ReturnsExpectedResult()
+    {
+        using StreamReader sr = new StreamReader("Day6\\Part1.real.txt");
+        Day6Puzzle.GetCharactersProcessedBeforeStartOfMessageMarker(sr).Should().Be((3059, true));
+    }
 }

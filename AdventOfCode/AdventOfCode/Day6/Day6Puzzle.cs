@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -8,28 +7,40 @@ namespace AdventOfCode.Day6;
 public static class Day6Puzzle
 {
     private const int StartOfPacketMarkerLength = 4;
+    private const int StartOfMessageMarkerLength = 14;
 
     public static (int, bool) GetCharactersProcessedBeforeStartOfPacketMarker(StreamReader streamReader)
     {
+        return ReadUntilMarker(streamReader, StartOfPacketMarkerLength);
+    }
+
+    public static (int, bool) GetCharactersProcessedBeforeStartOfMessageMarker(StreamReader streamReader)
+    {
+        return ReadUntilMarker(streamReader, StartOfMessageMarkerLength);
+    }
+
+    private static (int, bool) ReadUntilMarker(StreamReader streamReader, int bufferMaxLength)
+    {
         var buff = new List<char>();
         var numRead = 0;
-        while (!IsStartOfPacket(buff) && !streamReader.EndOfStream)
+        
+        while (!IsUniqueCharsMarkerDetected(buff, bufferMaxLength) && !streamReader.EndOfStream)
         {
-            buff = AddCharToBuffer(buff, streamReader.Read());
+            buff = AddCharToBuffer(buff, streamReader.Read(), bufferMaxLength);
             numRead++;
         }
 
-        return (numRead, IsStartOfPacket(buff));
+        return (numRead, IsUniqueCharsMarkerDetected(buff, bufferMaxLength));
     }
 
-    private static List<char> AddCharToBuffer(List<char> buff, int ch)
+    private static List<char> AddCharToBuffer(List<char> buff, int ch, int bufferMaxLength)
     {
-        return buff.Append((char) ch).TakeLast(StartOfPacketMarkerLength).ToList();
+        return buff.Append((char) ch).TakeLast(bufferMaxLength).ToList();
     }
 
-    private static bool IsStartOfPacket(List<char> buff)
+    private static bool IsUniqueCharsMarkerDetected(List<char> buff, int markerLength)
     {
-        return buff.Count == StartOfPacketMarkerLength &&
-               buff.Distinct().Count() == StartOfPacketMarkerLength;
+        return buff.Count == markerLength &&
+               buff.Distinct().Count() == markerLength;
     }
 }
