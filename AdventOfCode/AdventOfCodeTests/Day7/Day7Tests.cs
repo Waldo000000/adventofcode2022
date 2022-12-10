@@ -5,7 +5,6 @@ using System.Text.RegularExpressions;
 using AdventOfCode.Day7;
 using FluentAssertions;
 using NUnit.Framework;
-using NUnit.Framework.Internal;
 
 namespace AdventOfCodeTests.Day7;
 
@@ -22,13 +21,20 @@ public class Day7Tests
     [Test]
     public void GetSumOfSizesOfDirectories_WithMaxSize100000AndSampleData_ReturnsExpectedResult()
     {
-        var terminalOutput = ParseTerminalOutput().ToArray();
+        var terminalOutput = ParseTerminalOutput("Day7\\Part1.sample.txt").ToArray();
+        Day7Puzzle.GetSumOfSizesOfDirectories(terminalOutput, 100000).Should().Be(95437);
+    }
+    
+    [Test]
+    public void GetSumOfSizesOfDirectories_WithMaxSize100000AndRealData_ReturnsExpectedResult()
+    {
+        var terminalOutput = ParseTerminalOutput("Day7\\Part1.real.txt").ToArray();
         Day7Puzzle.GetSumOfSizesOfDirectories(terminalOutput, 100000).Should().Be(95437);
     }
 
-    private static IEnumerable<Command> ParseTerminalOutput()
+    private static IEnumerable<Command> ParseTerminalOutput(string filename)
     {
-        var text = System.IO.File.ReadAllText("Day7\\Part1.sample.txt");
+        var text = System.IO.File.ReadAllText(filename);
 
         return CommandWithOutputRegex.Matches(text).Select(ParseCommand);
     }
@@ -70,10 +76,5 @@ public class Day7Tests
         }
 
         throw new Exception($"Couldn't parse command: {commandWithOutput}");
-    }
-
-    [Test]
-    public void GetSumOfSizesOfDirectories_WithMaxSize100000AndRealData_ReturnsExpectedResult()
-    {
     }
 }
