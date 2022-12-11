@@ -6,6 +6,8 @@ namespace AdventOfCode.Day9;
 
 public static class Day9Puzzle
 {
+    public static readonly Coord Origin = new(0, 0);
+
     public static int GetNumberOfUniqueTailPositions(Motion[] motions, Rope rope)
     {
         var tailPositions = new HashSet<Coord>();
@@ -23,23 +25,70 @@ public static class Day9Puzzle
 
 public class Rope
 {
-    private static readonly Coord Origin = new(0, 0);
+    public Knot TopKnot { get; }
+    public Coord TailPosition
+    {
+        get
+        {
+            var knot = TopKnot;
+            while (knot.NextKnot != null)
+            {
+                knot = knot.NextKnot;
+            }
+
+            return knot.Position;
+        }
+    }
+
+    public Rope(Knot topKnot)
+    {
+        TopKnot = topKnot;
+    }
+
+    
+    public static Rope Create(int numKnots)
+    {
+        var topKnot = new Knot();
+        var head = topKnot;
+        for (int i = 0; i < numKnots - 1; i++)
+        {
+            var nextKnot = new Knot();
+            head.RegisterNextKnot(nextKnot);
+            head = nextKnot;
+        }
+
+        return new Rope(topKnot);
+    }
 
     public void Move(Direction direction)
     {
-        var newHeadPosition = HeadPosition.Move(direction);
-        if (!TailPosition.IsAdjacent(newHeadPosition))
-            TailPosition = HeadPosition;
-        HeadPosition = newHeadPosition;
+        TopKnot.Move(direction);
+    }
+}
+
+public class Knot
+{
+    public Knot? NextKnot { get; private set; }
+
+    public void RegisterNextKnot(Knot? nextKnot)
+    {
+        NextKnot = nextKnot;
+    }
+    
+    public void Move(Direction direction)
+    {
+        var newPosition = Position.Moved(direction);
+        if (NextKnot != null && !NextKnot.Position.IsAdjacent(newPosition))
+            NextKnot.Position = Position;
+        Position = newPosition;
     }
 
-    public Coord HeadPosition { get; private set; } = Origin;
-    public Coord TailPosition { get; private set; } = Origin;
+    public Coord Position { get; private set; } = Day9Puzzle.Origin;
 }
 
 public static class CoordExtensions
 {
-    public static Coord Move(this Coord coord, Direction direction)
+    public static Coord Moved(this Coord coord, Direction direction)
     {
         return direction switch
         {

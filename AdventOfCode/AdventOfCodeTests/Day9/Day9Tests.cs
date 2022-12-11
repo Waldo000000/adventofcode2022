@@ -14,28 +14,28 @@ public class Day9Tests
     public void GetNumberOfUniqueTailPositions_WithTwoKnotsWithSampleData_ReturnsExpectedResult()
     {
         var motions = ReadMotions("Day9\\Part1.sample.txt");
-        Day9Puzzle.GetNumberOfUniqueTailPositions(motions, new Rope()).Should().Be(13);
+        Day9Puzzle.GetNumberOfUniqueTailPositions(motions, Rope.Create(2)).Should().Be(13);
     }
 
     [Test]
     public void GetNumberOfUniqueTailPositions_WithTwoKnotsWithRealData_ReturnsExpectedResult()
     {
         var motions = ReadMotions("Day9\\Part1.real.txt");
-        Day9Puzzle.GetNumberOfUniqueTailPositions(motions, new Rope()).Should().Be(6311);
+        Day9Puzzle.GetNumberOfUniqueTailPositions(motions, Rope.Create(2)).Should().Be(6311);
     }
 
     [Test]
     public void GetNumberOfUniqueTailPositions_WithTenKnotsWithPart1SampleData_ReturnsExpectedResult()
     {
         var motions = ReadMotions("Day9\\Part1.sample.txt");
-        Day9Puzzle.GetNumberOfUniqueTailPositions(motions, new Rope()).Should().Be(1);
+        Day9Puzzle.GetNumberOfUniqueTailPositions(motions, Rope.Create(10)).Should().Be(1);
     }
     
     [Test]
     public void GetNumberOfUniqueTailPositions_WithTenKnotsWithPart2SampleData_ReturnsExpectedResult()
     {
         var motions = ReadMotions("Day9\\Part2.sample.txt");
-        Day9Puzzle.GetNumberOfUniqueTailPositions(motions, new Rope()).Should().Be(36);
+        Day9Puzzle.GetNumberOfUniqueTailPositions(motions, Rope.Create(10)).Should().Be(36);
     }
 
     private static Motion[] ReadMotions(string inputFilepath)
