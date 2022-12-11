@@ -26,6 +26,7 @@ public static class Day9Puzzle
 public class Rope
 {
     public Knot TopKnot { get; }
+
     public Coord TailPosition
     {
         get
@@ -45,7 +46,7 @@ public class Rope
         TopKnot = topKnot;
     }
 
-    
+
     public static Rope Create(int numKnots)
     {
         var topKnot = new Knot();
@@ -74,13 +75,52 @@ public class Knot
     {
         NextKnot = nextKnot;
     }
-    
+
     public void Move(Direction direction)
     {
-        var newPosition = Position.Moved(direction);
-        if (NextKnot != null && !NextKnot.Position.IsAdjacent(newPosition))
-            NextKnot.Position = Position;
-        Position = newPosition;
+        Position = Position.Moved(direction);
+        
+        if (NextKnot == null) return;
+
+        NextKnot.Follow(Position);
+    }
+
+    private void Follow(Coord target)
+    {
+        Position = GetNewPositionAfterFollowing(target);
+
+        if (NextKnot == null) return;
+
+        NextKnot.Follow(Position);
+    }
+
+    private Coord GetNewPositionAfterFollowing(Coord target)
+    {
+        if (!Position.IsXAdjacent(target))
+        {
+            if (!Position.IsYAdjacent(target))
+            {
+                return new Coord(
+                    target.X < Position.X ? Position.X - 1 : Position.X + 1,
+                    target.Y < Position.Y ? Position.Y - 1 : Position.Y + 1
+                );
+            }
+
+            return new Coord(
+                target.X < Position.X ? Position.X - 1 : Position.X + 1,
+                target.Y != Position.Y ? target.Y : Position.Y
+            );
+        }
+
+        if (!Position.IsYAdjacent(target))
+        {
+            return new Coord(
+                target.X != Position.X ? target.X : Position.X,
+                target.Y < Position.Y ? Position.Y - 1 : Position.Y + 1
+            );
+        }
+
+        return Position;
     }
 
     public Coord Position { get; private set; } = Day9Puzzle.Origin;
@@ -92,29 +132,65 @@ public static class CoordExtensions
     {
         return direction switch
         {
-            Direction.Up => coord with {y = coord.y + 1},
-            Direction.Down => coord with {y = coord.y - 1},
-            Direction.Left => coord with {x = coord.x - 1},
-            Direction.Right => coord with {x = coord.x + 1},
+            Direction.Up => coord with {Y = coord.Y + 1},
+            Direction.Down => coord with {Y = coord.Y - 1},
+            Direction.Left => coord with {X = coord.X - 1},
+            Direction.Right => coord with {X = coord.X + 1},
             _ => throw new ArgumentOutOfRangeException($"Unrecognized direction {direction}")
         };
     }
 
     public static bool IsAdjacent(this Coord firstCoord, Coord secondCoord)
     {
-        return Math.Abs(firstCoord.x - secondCoord.x) <= 1 &&
-               Math.Abs(firstCoord.y - secondCoord.y) <= 1;
+        return Math.Abs(firstCoord.X - secondCoord.X) <= 1 &&
+               Math.Abs(firstCoord.Y - secondCoord.Y) <= 1;
+    }
+
+    public static bool IsXAdjacent(this Coord fromCoord, Coord toCoord)
+    {
+        return Math.Abs(fromCoord.X - toCoord.X) <= 1;
+    }
+
+    public static bool IsYAdjacent(this Coord fromCoord, Coord toCoord)
+    {
+        return Math.Abs(fromCoord.Y - toCoord.Y) <= 1;
+    }
+
+    public static Direction? GetXDirection(this Coord fromCoord, Coord toCoord)
+    {
+        var xDelta = toCoord.X - fromCoord.X;
+        if (xDelta < 0)
+            return Direction.Left;
+        if (xDelta > 0)
+            return Direction.Right;
+        return null;
+    }
+
+    public static Direction? GetYDirection(this Coord fromCoord, Coord toCoord)
+    {
+        var yDelta = toCoord.Y - fromCoord.Y;
+        if (yDelta < 0)
+            return Direction.Down;
+        if (yDelta > 0)
+            return Direction.Up;
+        return null;
     }
 }
 
-public record Coord(int x, int y);
+public record Coord(int X, int Y);
 
 public record Motion(Direction Direction, int NumSteps);
 
 public enum Direction
 {
     Up,
+
+    // UpLeft,
+    // UpRight,
     Down,
+
+    // DownLeft,
+    // DownRight,
     Left,
     Right
 }

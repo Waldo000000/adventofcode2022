@@ -38,6 +38,12 @@ public class Day9Tests
         Day9Puzzle.GetNumberOfUniqueTailPositions(motions, Rope.Create(10)).Should().Be(36);
     }
 
+    [Test]
+    public void GetNumberOfUniqueTailPositions_WithTenKnotsWithPart2RealData_ReturnsExpectedResult()
+    {
+        var motions = ReadMotions("Day9\\Part1.real.txt");
+        Day9Puzzle.GetNumberOfUniqueTailPositions(motions, Rope.Create(10)).Should().Be(36);
+    }
     private static Motion[] ReadMotions(string inputFilepath)
     {
         IEnumerable<string> lines = File.ReadAllLines(inputFilepath);
