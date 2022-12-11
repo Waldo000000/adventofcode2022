@@ -6,6 +6,31 @@ namespace AdventOfCode.Day10;
 
 public static class Day10Puzzle
 {
+    private const int CrtWidth = 40;
+
+    public static string[] GetCrtOutput(Operation[] operations)
+    {
+        var processor = new Processor(0, 1);
+        return operations.ToList()
+            .SelectMany(processor.Process)
+            .Select((state, cycleIdx) => GetSpriteMask(state)[cycleIdx % CrtWidth])
+            .Chunk(CrtWidth)
+            .Select(chunk => new string(chunk.Select(c => c ? '#' : '.').ToArray()))
+            .ToArray();
+    }
+
+    private static bool[] GetSpriteMask(ProcessorState state)
+    {
+        var spriteMask = Enumerable.Range(0, CrtWidth).Select(_ => false).ToArray();
+        foreach (var offset in new[] {-1, 0, 1})
+        {
+            var spriteOnIdx = state.RegisterXValue + offset;
+            if (spriteOnIdx >= 0 && spriteOnIdx < spriteMask.Length)
+                spriteMask[spriteOnIdx] = true;
+        }
+        return spriteMask;
+    }
+
     public static IEnumerable<ProcessorState> GetState(Operation[] operations)
     {
         var processor = new Processor(0, 1);

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using AdventOfCode.Day10;
@@ -33,6 +34,41 @@ public class Day10Tests
     {
         var operations = ReadOperations("Day10\\Part1.real.txt");
         Day10Puzzle.GetSumOfSignalStrengths(operations, 20, 40).Should().Be(14060);
+    }
+
+    [Test]
+    public void GetCrtOutput_WithSampleData_ReturnsExpectedResult()
+    {
+        var operations = ReadOperations("Day10\\Part1.sample.txt");
+        var crtOutput = Day10Puzzle.GetCrtOutput(operations);
+        crtOutput
+            .Should().Equal(
+                "##..##..##..##..##..##..##..##..##..##..",
+                "###...###...###...###...###...###...###.",
+                "####....####....####....####....####....",
+                "#####.....#####.....#####.....#####.....",
+                "######......######......######......####",
+                "#######.......#######.......#######....."
+            );
+    }
+
+    [Test]
+    public void GetCrtOutput_WithRealData_ReturnsExpectedResult()
+    {
+        var operations = ReadOperations("Day10\\Part1.real.txt");
+        var crtOutput = Day10Puzzle.GetCrtOutput(operations);
+        Console.Write(crtOutput);
+        
+        // Letters are PAPKFKEJ
+        crtOutput
+            .Should().Equal(
+                "###...##..###..#..#.####.#..#.####...##.",
+                "#..#.#..#.#..#.#.#..#....#.#..#.......#.",
+                "#..#.#..#.#..#.##...###..##...###.....#.",
+                "###..####.###..#.#..#....#.#..#.......#.",
+                "#....#..#.#....#.#..#....#.#..#....#..#.",
+                "#....#..#.#....#..#.#....#..#.####..##.."
+            );
     }
 
     private Operation[] ReadOperations(string filename)
