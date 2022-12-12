@@ -42,7 +42,7 @@ public class Day9Tests
     public void GetNumberOfUniqueTailPositions_WithTenKnotsWithPart2RealData_ReturnsExpectedResult()
     {
         var motions = ReadMotions("Day9\\Part1.real.txt");
-        Day9Puzzle.GetNumberOfUniqueTailPositions(motions, Rope.Create(10)).Should().Be(36);
+        Day9Puzzle.GetNumberOfUniqueTailPositions(motions, Rope.Create(10)).Should().Be(2482);
     }
     private static Motion[] ReadMotions(string inputFilepath)
     {
