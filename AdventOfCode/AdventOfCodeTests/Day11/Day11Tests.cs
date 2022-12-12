@@ -15,21 +15,32 @@ public class Day11Tests
     {
         var monkeys = ReadMonkeys("Day11\\Part1.sample.txt").ToArray();
 
-        Day11Puzzle.GetLevelOfMonkeyBusiness(monkeys).Should().Be(10605);
+        Day11Puzzle.GetLevelOfMonkeyBusinessAfterRounds(monkeys, 20).Should().Be(10605);
+    }
+
+    [Test] public void GetLevelOfMonkeyBusiness_After20RoundsWithRealData_ReturnsExpectedValues()
+    {
+        var monkeys = ReadMonkeys("Day11\\Part1.real.txt").ToArray();
+
+        Day11Puzzle.GetLevelOfMonkeyBusinessAfterRounds(monkeys, 20).Should().Be(10605);
     }
 
     private IEnumerable<Monkey> ReadMonkeys(string filename)
     {
         return File.ReadAllLines(filename)
             .Chunk(7)
-            .Select(ch => ParseMonkey(ch))
+            .Select(ParseMonkey)
             .ToList();
     }
 
     private Monkey ParseMonkey(string[] lines)
     {
         var id = int.Parse(lines[0].Split("Monkey ")[1].Trim(':'));
-        var items = lines[1].Split(": ")[1].Split(", ").Select(int.Parse).ToList();
+        var items = lines[1].Split(": ")[1].Split(", ")
+            .Select(int.Parse)
+            .Select(worryLevel => new Item(worryLevel))
+            .ToList();
+
         var operation = new Expression(lines[2].Split("new = ")[1]);
         var divisibleByTest = int.Parse(lines[3].Split("divisible by ")[1]);
         var ifTestIsTrueThrowToMonkeyId = int.Parse(lines[4].Split("throw to monkey ")[1]);
