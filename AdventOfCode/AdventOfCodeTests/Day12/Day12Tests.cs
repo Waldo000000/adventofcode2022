@@ -6,25 +6,25 @@ using AdventOfCode.Day9;
 using FluentAssertions;
 using NUnit.Framework;
 
-namespace AdventOfCodeTests.Day11;
+namespace AdventOfCodeTests.Day12;
 
 public class Day12Tests
 {
-    private static readonly char[] Alphabet = "abcdefghijklmnopqrstuvwxyz".ToCharArray();
+    private static readonly char[] EncodedHeightsAscending = "abcdefghijklmnopqrstuvwxyz".ToCharArray();
 
     [Test]
     public void GetFewestStepsToBestSignal_WithSampleData_ReturnsExpectedValue()
     {
         var (currentPosition, bestSignalPosition, heightmap) = ReadHeightmap("Day12\\Part1.sample.txt");
 
-        Day12Puzzle.GetFewestStepsToBestSignal(currentPosition, bestSignalPosition, heightmap).Should().Be(10605);
+        Day12Puzzle.GetFewestStepsToBestSignal(currentPosition, bestSignalPosition, heightmap).Should().Be(31);
     }
 
     [Test] public void GetFewestStepsToBestSignal_WithRealData_ReturnsExpectedValue()
     {
-        var (currentPosition, bestSignalPosition, heightmap) = ReadHeightmap("Day12\\Part1.sample.txt");
+        var (currentPosition, bestSignalPosition, heightmap) = ReadHeightmap("Day12\\Part1.real.txt");
 
-        Day12Puzzle.GetFewestStepsToBestSignal(currentPosition, bestSignalPosition, heightmap).Should().Be(-1); // TODO
+        Day12Puzzle.GetFewestStepsToBestSignal(currentPosition, bestSignalPosition, heightmap).Should().Be(481);
     }
 
     private (Coord, Coord, Heightmap) ReadHeightmap(string filename)
@@ -64,8 +64,8 @@ public class Day12Tests
         return ch switch
         {
             'S' => 0,
-            'E' => Alphabet.Length - 1,
-            _ => Alphabet.ToList().FindIndex(c => c == ch)
+            'E' => EncodedHeightsAscending.Length - 1,
+            _ => EncodedHeightsAscending.ToList().FindIndex(c => c == ch)
         };
     }
 }
