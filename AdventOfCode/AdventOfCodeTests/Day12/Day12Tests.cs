@@ -26,6 +26,22 @@ public class Day12Tests
 
         Day12Puzzle.GetFewestStepsToBestSignal(currentPosition, bestSignalPosition, heightmap).Should().Be(481);
     }
+    
+    [Test]
+    public void GetFewestStepsFromLowestElevationToBestSignal_WithSampleData_ReturnsExpectedValue()
+    {
+        var (_, bestSignalPosition, heightmap) = ReadHeightmap("Day12\\Part1.sample.txt");
+
+        Day12Puzzle.GetFewestStepsFromLowestElevationToBestSignal(bestSignalPosition, heightmap).Should().Be(29);
+    }
+    
+    [Test]
+    public void GetFewestStepsFromLowestElevationToBestSignal_WithRealData_ReturnsExpectedValue()
+    {
+        var (_, bestSignalPosition, heightmap) = ReadHeightmap("Day12\\Part1.real.txt");
+
+        Day12Puzzle.GetFewestStepsFromLowestElevationToBestSignal(bestSignalPosition, heightmap).Should().Be(480);
+    }
 
     private (Coord, Coord, Heightmap) ReadHeightmap(string filename)
     {

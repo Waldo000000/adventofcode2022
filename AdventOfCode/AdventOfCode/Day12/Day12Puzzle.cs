@@ -8,6 +8,22 @@ namespace AdventOfCode.Day12;
 
 public static class Day12Puzzle
 {
+    public static int GetFewestStepsFromLowestElevationToBestSignal(Coord bestSignalPosition,
+        Heightmap heightmap)
+    {
+        var (nodeIds, graph) = CreateGraph(heightmap);
+        var lowestElevationCoords = heightmap.GetCoordsWithHeight(0);
+        return lowestElevationCoords
+            .Select(lowestElevationCoord =>
+            {
+                var from = nodeIds[lowestElevationCoord];
+                var to = nodeIds[bestSignalPosition];
+                var result = graph.Dijkstra(from, to);
+                return result.Distance;
+            })
+            .MinBy(distance => distance);
+    }
+
     public static int GetFewestStepsToBestSignal(Coord currentPosition, Coord bestSignalPosition, Heightmap heightmap)
     {
         var (nodeIds, graph) = CreateGraph(heightmap);
@@ -77,9 +93,31 @@ public record Heightmap(int[][] Heights)
             yield return new Coord(from.X, from.Y - 1);
     }
 
+    public IEnumerable<Coord> GetCoordsWithHeight(int height)
+    {
+        var matches = new List<Coord>();
+        Enumerable.Range(0, GetMaxX()).ToList().ForEach(xIdx =>
+        {
+            var ints = Enumerable.Range(0, GetMaxY()).ToList();
+            ints.ForEach(yIdx =>
+            {
+                if (GetHeight(xIdx, yIdx) == height)
+                {
+                    matches.Add(new Coord(xIdx, yIdx));
+                }
+            });
+        });
+        return matches;
+    }
+
     private int GetHeight(Coord coord)
     {
-        return Heights[coord.X][coord.Y];
+        return GetHeight(coord.X, coord.Y);
+    }
+
+    private int GetHeight(int x, int y)
+    {
+        return Heights[x][y];
     }
 
     public int GetMaxY() => Heights.First().Length;
