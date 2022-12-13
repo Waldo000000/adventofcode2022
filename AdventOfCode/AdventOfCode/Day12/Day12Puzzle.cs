@@ -11,4 +11,4 @@ public static class Day12Puzzle
     }
 }
 
-public record Heightmap(int[,] Heights);
+public record Heightmap(int[][] Heights);

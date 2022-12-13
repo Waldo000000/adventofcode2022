@@ -1,3 +1,6 @@
+using System;
+using System.IO;
+using System.Linq;
 using AdventOfCode.Day12;
 using AdventOfCode.Day9;
 using FluentAssertions;
@@ -7,6 +10,8 @@ namespace AdventOfCodeTests.Day11;
 
 public class Day12Tests
 {
+    private static readonly char[] Alphabet = "abcdefghijklmnopqrstuvwxyz".ToCharArray();
+
     [Test]
     public void GetFewestStepsToBestSignal_WithSampleData_ReturnsExpectedValue()
     {
@@ -24,11 +29,43 @@ public class Day12Tests
 
     private (Coord, Coord, Heightmap) ReadHeightmap(string filename)
     {
-        Coord currentPosition = new Coord(0, 0);
-        Coord bestSignalPosition = new Coord(0, 0);
-        return (currentPosition, bestSignalPosition, new Heightmap(new int[,]{}));
+        var lines = File.ReadAllLines(filename);
         
-        // TODO
-        // return File.ReadAllLines(filename);
+        var row = lines
+            .Select(line => line.ToCharArray())
+            .ToArray();
+
+        var currentPosition = GetCoordWithValue('S', row);
+        var bestSignalPosition = GetCoordWithValue('E', row);
+
+        var heights = row
+            .Select(charMatrixRow => charMatrixRow.Select(ToHeight).ToArray())
+            .ToArray();
+
+        return (currentPosition, bestSignalPosition, new Heightmap(heights));
+    }
+
+    private Coord GetCoordWithValue(char x, char[][] array)
+    {
+        for (int xIdx = 0; xIdx < array.Length; xIdx++)
+        {
+            for (int yIdx = 0; yIdx < array.First().Length; yIdx++)
+            {
+                if (array[xIdx][yIdx] == x)
+                    return new Coord(xIdx, yIdx);
+            }
+        }
+
+        throw new Exception($"Character not found: {x}");
+    }
+
+    private int ToHeight(char ch)
+    {
+        return ch switch
+        {
+            'S' => 0,
+            'E' => Alphabet.Length - 1,
+            _ => Alphabet.ToList().FindIndex(c => c == ch)
+        };
     }
 }
