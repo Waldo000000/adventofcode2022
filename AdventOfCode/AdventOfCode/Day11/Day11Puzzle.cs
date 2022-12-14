@@ -6,17 +6,17 @@ namespace AdventOfCode.Day11;
 
 public static class Day11Puzzle
 {
-    public static int GetLevelOfMonkeyBusinessAfterRounds(Monkey[] monkeys, int numRounds)
+    public static long GetLevelOfMonkeyBusinessAfterRounds(Monkey[] monkeys, long numRounds, IReliefStrategy reliefStrategy)
     {
-        for (int round = 0; round < numRounds; round++)
+        for (long round = 0; round < numRounds; round++)
         {
-            monkeys.ToList().ForEach(monkey => { monkey.InspectItemsThenThrowTo(monkeys); });
+            monkeys.ToList().ForEach(monkey => { monkey.InspectItemsThenThrowTo(monkeys, reliefStrategy); });
         }
 
         return GetMonkeyBusiness(monkeys);
     }
 
-    private static int GetMonkeyBusiness(Monkey[] monkeys)
+    private static long GetMonkeyBusiness(Monkey[] monkeys)
     {
         return monkeys
             .OrderByDescending(m => m.NumInspectedItems)
@@ -27,27 +27,28 @@ public static class Day11Puzzle
 }
 
 public record Monkey(
-    int Id,
+    long Id,
     List<Item> Items,
     Expression NewWorryLevelAfterInspectionOperation,
-    int NewWorryLevelIsDivisibleByTest,
-    int IfTestIsTrueThrowToMonkeyId,
-    int IfTestIsFalseThrowToMonkeyId
+    long NewWorryLevelIsDivisibleByTest,
+    long IfTestIsTrueThrowToMonkeyId,
+    long IfTestIsFalseThrowToMonkeyId
 )
 {
     private const string OldWorryLevelExpressionName = "old";
-    public int NumInspectedItems { get; private set; }
+    public long NumInspectedItems { get; private set; }
 
-    public void InspectItemsThenThrowTo(Monkey[] monkeys)
+    public void InspectItemsThenThrowTo(Monkey[] monkeys, IReliefStrategy reliefStrategy)
     {
         var oldItems = Items.ToList();
-        oldItems.ToList().ForEach(item => InspectItemThenThrowTo(monkeys, item));
+        oldItems.ToList().ForEach(item => InspectItemThenThrowTo(monkeys, item, reliefStrategy));
     }
 
-    private void InspectItemThenThrowTo(Monkey[] monkeys, Item item)
+    private void InspectItemThenThrowTo(Monkey[] monkeys, Item item, IReliefStrategy reliefStrategy)
     {
         NumInspectedItems++;
         UpdateWorryLevelAfterInspection(item);
+        reliefStrategy.AdjustWorryLevel(item, monkeys);
         var toMonkeyId = GetThrowToMonkeyId(item);
         ThrowItemTo(monkeys, toMonkeyId, item);
     }
@@ -55,18 +56,17 @@ public record Monkey(
     private void UpdateWorryLevelAfterInspection(Item item)
     {
         NewWorryLevelAfterInspectionOperation.Parameters[OldWorryLevelExpressionName] = item.WorryLevel;
-        var newWorryLevel = (int) NewWorryLevelAfterInspectionOperation.Evaluate();
-        item.WorryLevel = newWorryLevel / 3;
+        item.WorryLevel = (long) NewWorryLevelAfterInspectionOperation.Evaluate();
     }
 
-    private int GetThrowToMonkeyId(Item item)
+    private long GetThrowToMonkeyId(Item item)
     {
         return item.WorryLevel % NewWorryLevelIsDivisibleByTest == 0
             ? IfTestIsTrueThrowToMonkeyId
             : IfTestIsFalseThrowToMonkeyId;
     }
 
-    private void ThrowItemTo(Monkey[] monkeys, int toMonkeyId, Item item)
+    private void ThrowItemTo(Monkey[] monkeys, long toMonkeyId, Item item)
     {
         var toMonkey = GetMonkeyWithId(monkeys, toMonkeyId);
 
@@ -74,18 +74,49 @@ public record Monkey(
         Items.Remove(item);
     }
 
-    private static Monkey GetMonkeyWithId(Monkey[] monkeys, int toMonkeyId)
+    private static Monkey GetMonkeyWithId(Monkey[] monkeys, long toMonkeyId)
     {
         return monkeys.Single(m => m.Id == toMonkeyId);
     }
 }
 
+public interface IReliefStrategy
+{
+    void AdjustWorryLevel(Item item, Monkey[] monkeys);
+}
+
+public class ReduceWorryStrategy : IReliefStrategy
+{
+    public void AdjustWorryLevel(Item item, Monkey[] monkeys)
+    {
+        item.WorryLevel /= 3;
+    }
+}
+
+public class ModuloReduceWorryStrategy : IReliefStrategy
+{
+    // Copied from https://github.com/TomPeters/advent-of-code-2022/blob/main/AdventOfCode/AdventOfCode/Day11/Day11Puzzle.cs#L12
+    public void AdjustWorryLevel(Item item, Monkey[] monkeys)
+    {
+        var productOfAllDivisors = monkeys.ToList().Select(m => m.NewWorryLevelIsDivisibleByTest).Product();
+        item.WorryLevel %= productOfAllDivisors;
+    }
+}
+
 public class Item
 {
-    public Item(int worryLevel)
+    public Item(long worryLevel)
     {
         WorryLevel = worryLevel;
     }
 
-    public int WorryLevel { get; set; }
+    public long WorryLevel { get; set; }
 };
+
+public static class EnumerableExtensions
+{
+    public static long Product(this IEnumerable<long> factors)
+    {
+        return factors.Aggregate(1L, (p, c) => p * c);
+    }
+}
