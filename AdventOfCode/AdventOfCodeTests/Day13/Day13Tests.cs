@@ -12,53 +12,91 @@ public class Day13Tests
     [Test]
     public void GetSumOfIndicesOfOrderedPairs_WithSampleData_ReturnsExpectedValue()
     {
-        var packetPairs = ReadPacketPairs("Day12\\Part1.sample.txt").ToArray();
+        var packetPairs = ReadPacketPairs("Day13\\Part1.sample.txt").ToArray();
 
         Day13Puzzle.GetSumOfIndicesOfOrderedPairs(packetPairs).Should().Be(13);
     }
 
+    [Test]
+    public void GetSumOfIndicesOfOrderedPairs_WithRealData_ReturnsExpectedValue()
+    {
+        var packetPairs = ReadPacketPairs("Day13\\Part1.real.txt").ToArray();
+
+        Day13Puzzle.GetSumOfIndicesOfOrderedPairs(packetPairs).Should().Be(5720);
+    }
+
     private IEnumerable<PacketPair> ReadPacketPairs(string filename)
     {
-        yield return new PacketPair(
-            new Packet(new ListPacketItem(
-                new IntegerPacketItem(1),
-                new IntegerPacketItem(1),
-                new IntegerPacketItem(3),
-                new IntegerPacketItem(1),
-                new IntegerPacketItem(1))
-            ),
-            new Packet(new ListPacketItem(
-                new IntegerPacketItem(1),
-                new IntegerPacketItem(1),
-                new IntegerPacketItem(5),
-                new IntegerPacketItem(1),
-                new IntegerPacketItem(1)
-            )));
-        yield return new PacketPair(
-            new Packet(new ListPacketItem(
-                new ListPacketItem(new IntegerPacketItem(1)),
-                new ListPacketItem(new IntegerPacketItem(2), new IntegerPacketItem(3), new IntegerPacketItem(4))
-            )),
-            new Packet(new ListPacketItem(
-                new ListPacketItem(new IntegerPacketItem(1)),
-                new IntegerPacketItem(4)
-            )));
-
-        
-        // TODO
-        // return File.ReadAllLines(filename)
-        //     .Chunk(3)
-        //     .Select(chunk =>
-        //     {
-        //         var packetPairLines = chunk.Take(2).ToArray();
-        //         Packet leftPacket = ReadPacket(chunk.First());
-        //         var rightPacket = ReadPacket(chunk.Skip(1).First());
-        //         return new PacketPair(leftPacket, rightPacket);
-        //     }).ToArray();
+        return File.ReadAllLines(filename)
+            .Chunk(3)
+            .Select(chunk =>
+            {
+                Packet leftPacket = ReadPacket(chunk.First());
+                var rightPacket = ReadPacket(chunk.Skip(1).First());
+                return new PacketPair(leftPacket, rightPacket);
+            }).ToArray();
     }
 
     private Packet ReadPacket(string line)
     {
-        throw new System.NotImplementedException();
+        return new Packet(ReadListPacketItem(line));
+    }
+
+    private PacketItem ReadPacketItem(string chars)
+    {
+        return IsList(chars)
+            ? ReadListPacketItem(chars)
+            : new IntegerPacketItem(int.Parse(chars));
+    }
+
+    private ListPacketItem ReadListPacketItem(string chars)
+    {
+        var unwrapped = string.Concat(chars.Skip(1).SkipLast(1));
+
+        var innerPacketItems = Split(unwrapped)
+            .Select(ReadPacketItem)
+            .ToArray();
+
+        return new ListPacketItem(innerPacketItems);
+    }
+
+    private static IEnumerable<string> Split(string unwrapped)
+    {
+        var nesting = 0;
+        IList<char> chars = new List<char>();
+        foreach (var ch in unwrapped)
+        {
+            if (ch == '[')
+                nesting++;
+
+            if (ch == ']')
+                nesting--;
+
+            if (nesting == 0)
+            {
+                if (ch == ',')
+                {
+                    yield return string.Concat(chars);
+                    chars.Clear();
+                }
+                else
+                {
+                    chars.Add(ch);
+                }
+            }
+            else
+            {
+                chars.Add(ch);
+            }
+            
+        }
+
+        if (chars.Any())
+            yield return string.Concat(chars);
+    }
+
+    private bool IsList(string chars)
+    {
+        return chars.First() == '[';
     }
 }

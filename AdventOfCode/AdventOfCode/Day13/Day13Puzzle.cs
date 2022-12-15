@@ -15,8 +15,6 @@ public static class Day13Puzzle
             if (packetPairs[idx].IsOrdered() == true)
                 orderedPairIndices.Add(idx + 1);
         }
-
-        ;
         return orderedPairIndices.Sum();
     }
 }
@@ -43,7 +41,7 @@ public record PacketItemPair(PacketItem? Left, PacketItem? Right)
 
 public record Packet(ListPacketItem Items);
 
-public abstract record PacketItem()
+public abstract record PacketItem
 {
     public abstract bool? IsOrdered(PacketItem right);
 }
@@ -55,7 +53,7 @@ public record ListPacketItem() : PacketItem
         Value = value;
     }
 
-    public PacketItem[] Value { get; private set; }
+    public PacketItem[] Value { get; }
 
     public override bool? IsOrdered(PacketItem right)
     {
@@ -69,7 +67,7 @@ public record ListPacketItem() : PacketItem
 
     private bool? IsOrdered(IntegerPacketItem right)
     {
-        return new ListPacketItem(new[] {right}).IsOrdered(right);
+        return IsOrdered(new ListPacketItem(right));
     }
 
     private bool? IsOrdered(ListPacketItem right)
@@ -128,6 +126,6 @@ public record IntegerPacketItem() : PacketItem
 
     private bool? IsOrdered(ListPacketItem right)
     {
-        return new ListPacketItem(new PacketItem[] {this}).IsOrdered(right);
+        return new ListPacketItem(this).IsOrdered(right);
     }
 }
