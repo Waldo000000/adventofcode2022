@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using AdventOfCode.Day12;
-using AdventOfCode.Day9;
+using AdventOfCode.Shared;
 using FluentAssertions;
 using NUnit.Framework;
 

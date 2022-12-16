@@ -1,6 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
+using AdventOfCode.Shared;
 
 namespace AdventOfCode.Day9;
 
@@ -79,7 +79,7 @@ public class Knot
     public void Move(Direction direction)
     {
         Position = Position.Moved(direction);
-        
+
         if (NextKnot == null) return;
 
         NextKnot.Follow(Position);
@@ -126,71 +126,4 @@ public class Knot
     public Coord Position { get; private set; } = Day9Puzzle.Origin;
 }
 
-public static class CoordExtensions
-{
-    public static Coord Moved(this Coord coord, Direction direction)
-    {
-        return direction switch
-        {
-            Direction.Up => coord with {Y = coord.Y + 1},
-            Direction.Down => coord with {Y = coord.Y - 1},
-            Direction.Left => coord with {X = coord.X - 1},
-            Direction.Right => coord with {X = coord.X + 1},
-            _ => throw new ArgumentOutOfRangeException($"Unrecognized direction {direction}")
-        };
-    }
-
-    public static bool IsAdjacent(this Coord firstCoord, Coord secondCoord)
-    {
-        return Math.Abs(firstCoord.X - secondCoord.X) <= 1 &&
-               Math.Abs(firstCoord.Y - secondCoord.Y) <= 1;
-    }
-
-    public static bool IsXAdjacent(this Coord fromCoord, Coord toCoord)
-    {
-        return Math.Abs(fromCoord.X - toCoord.X) <= 1;
-    }
-
-    public static bool IsYAdjacent(this Coord fromCoord, Coord toCoord)
-    {
-        return Math.Abs(fromCoord.Y - toCoord.Y) <= 1;
-    }
-
-    public static Direction? GetXDirection(this Coord fromCoord, Coord toCoord)
-    {
-        var xDelta = toCoord.X - fromCoord.X;
-        if (xDelta < 0)
-            return Direction.Left;
-        if (xDelta > 0)
-            return Direction.Right;
-        return null;
-    }
-
-    public static Direction? GetYDirection(this Coord fromCoord, Coord toCoord)
-    {
-        var yDelta = toCoord.Y - fromCoord.Y;
-        if (yDelta < 0)
-            return Direction.Down;
-        if (yDelta > 0)
-            return Direction.Up;
-        return null;
-    }
-}
-
-public record Coord(int X, int Y);
-
 public record Motion(Direction Direction, int NumSteps);
-
-public enum Direction
-{
-    Up,
-
-    // UpLeft,
-    // UpRight,
-    Down,
-
-    // DownLeft,
-    // DownRight,
-    Left,
-    Right
-}

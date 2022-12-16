@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using AdventOfCode.Day9;
+using AdventOfCode.Shared;
 using Dijkstra.NET.Graph.Simple;
 using Dijkstra.NET.ShortestPath;
 

@@ -1,5 +1,5 @@
 ﻿using System;
-using AdventOfCode.Day9;
+using AdventOfCode.Shared;
 
 namespace AdventOfCode.Day14;
 
