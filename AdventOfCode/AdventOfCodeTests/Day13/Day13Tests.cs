@@ -25,6 +25,30 @@ public class Day13Tests
         Day13Puzzle.GetSumOfIndicesOfOrderedPairs(packetPairs).Should().Be(5720);
     }
 
+    [Test]
+    public void GetDecoderKey_WithSampleData_ReturnsExpectedValue()
+    {
+        var packetPairs = ReadPacketPairs("Day13\\Part1.sample.txt").ToArray();
+
+        var packets = packetPairs
+            .SelectMany(packetPair => new[] {packetPair.Left, packetPair.Right})
+            .ToArray();
+
+        Day13Puzzle.GetDecoderKey(packets.ToArray()).Should().Be(140);
+    }
+
+    [Test]
+    public void GetDecoderKey_WithRealData_ReturnsExpectedValue()
+    {
+        var packetPairs = ReadPacketPairs("Day13\\Part1.real.txt").ToArray();
+
+        var packets = packetPairs
+            .SelectMany(packetPair => new[] {packetPair.Left, packetPair.Right})
+            .ToArray();
+
+        Day13Puzzle.GetDecoderKey(packets.ToArray()).Should().Be(23504);
+    }
+
     private IEnumerable<PacketPair> ReadPacketPairs(string filename)
     {
         return File.ReadAllLines(filename)
@@ -88,7 +112,6 @@ public class Day13Tests
             {
                 chars.Add(ch);
             }
-            
         }
 
         if (chars.Any())

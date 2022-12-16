@@ -1,49 +1,70 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
+using System.Diagnostics;
 using System.Linq;
+using AdventOfCode.Day11;
 
 namespace AdventOfCode.Day13;
 
 public static class Day13Puzzle
 {
+    public static readonly Packet[] DividerPackets =
+    {
+        new Packet(new ListPacketItem(new ListPacketItem(new IntegerPacketItem(2)))),
+        new Packet(new ListPacketItem(new ListPacketItem(new IntegerPacketItem(6)))),
+    };
+
     // Returns sum of 1-based indices
     public static int GetSumOfIndicesOfOrderedPairs(PacketPair[] packetPairs)
     {
-        var orderedPairIndices = new List<int>();
-        for (int idx = 0; idx < packetPairs.Length; idx++)
-        {
-            if (packetPairs[idx].IsOrdered() == true)
-                orderedPairIndices.Add(idx + 1);
-        }
-        return orderedPairIndices.Sum();
+        return packetPairs
+            .Select((pair, idx) => (pair, idx))
+            .Where(tuple => tuple.pair.IsInCorrectOrder())
+            .Select(tuple => tuple.idx + 1)
+            .Sum();
+    }
+
+    public static int GetDecoderKey(Packet[] packets)
+    {
+        var packetsWithDividers = packets
+            .Concat(DividerPackets)
+            .ToList();
+
+        packetsWithDividers.Sort();
+
+        return DividerPackets
+            .Select(dividerPacket => packetsWithDividers.IndexOf(dividerPacket) + 1)
+            .Product();
     }
 }
 
 public record PacketPair(Packet Left, Packet Right)
 {
-    public bool? IsOrdered()
+    public bool IsInCorrectOrder() => Left.CompareTo(Right) < 0;
+
+    public int CompareTo()
     {
-        return Left.Items.IsOrdered(Right.Items);
+        return Left.Items.CompareTo(Right.Items);
     }
 }
 
-public record PacketItemPair(PacketItem? Left, PacketItem? Right)
+public record Packet(ListPacketItem Items) : IComparable<Packet>
 {
-    public bool? IsOrdered()
+    public int CompareTo(Packet? other)
     {
-        return Left == null
-            ? Right != null ? true : null
-            : Right == null
-                ? false
-                : Left.IsOrdered(Right);
+        return Items.CompareTo(other.Items);
+    }
+
+    public override string ToString()
+    {
+        return Items.ToString();
     }
 }
-
-public record Packet(ListPacketItem Items);
 
 public abstract record PacketItem
 {
-    public abstract bool? IsOrdered(PacketItem right);
+    public abstract int CompareTo(PacketItem right);
 }
 
 public record ListPacketItem() : PacketItem
@@ -55,47 +76,39 @@ public record ListPacketItem() : PacketItem
 
     public PacketItem[] Value { get; }
 
-    public override bool? IsOrdered(PacketItem right)
+    public override int CompareTo(PacketItem right)
     {
         return right switch
         {
-            IntegerPacketItem integerRight => IsOrdered(integerRight),
-            ListPacketItem listRight => IsOrdered(listRight),
+            IntegerPacketItem integerRight => CompareTo(integerRight),
+            ListPacketItem listRight => CompareTo(listRight),
             _ => throw new ArgumentOutOfRangeException(nameof(right))
         };
     }
 
-    private bool? IsOrdered(IntegerPacketItem right)
+    private int CompareTo(IntegerPacketItem right)
     {
-        return IsOrdered(new ListPacketItem(right));
+        return CompareTo(new ListPacketItem(right));
     }
 
-    private bool? IsOrdered(ListPacketItem right)
+    private int CompareTo(ListPacketItem right)
     {
-        var (leftPadded, rightPadded) = PadToMatchLengths(Value, right.Value);
-        return leftPadded
-            .Zip(rightPadded)
-            .Select(pair => new PacketItemPair(pair.First, pair.Second).IsOrdered())
-            .FirstOrDefault(result => result != null);
+        var comparisons = Value
+            .Zip(right.Value)
+            .Select(pair => pair.First.CompareTo(pair.Second));
+
+        var firstNonEqualComparison = comparisons.FirstOrDefault(c => c != 0);
+        if (firstNonEqualComparison != 0) return firstNonEqualComparison;
+        return Value.Length.CompareTo(right.Value.Length);
     }
 
-    private (PacketItem?[], PacketItem?[] rightItems) PadToMatchLengths(PacketItem[] leftItems, PacketItem[] rightItems)
+    public override string ToString()
     {
-        if (leftItems.Length < rightItems.Length)
-            return (
-                leftItems.Concat(Enumerable.Repeat<PacketItem?>(null, rightItems.Length - leftItems.Length)).ToArray(),
-                rightItems
-            );
-
-        if (leftItems.Length > rightItems.Length)
-            return (
-                leftItems,
-                rightItems.Concat(Enumerable.Repeat<PacketItem?>(null, leftItems.Length - rightItems.Length)).ToArray()
-            );
-        return (leftItems, rightItems);
+        return string.Concat("[", string.Join(',', (object[])Value), "]");
     }
 }
 
+[DebuggerDisplay("{Value}")]
 public record IntegerPacketItem() : PacketItem
 {
     public IntegerPacketItem(int value) : this()
@@ -105,7 +118,7 @@ public record IntegerPacketItem() : PacketItem
 
     public int Value { get; }
 
-    public override bool? IsOrdered(PacketItem right)
+    public override int CompareTo(PacketItem right)
     {
         return right switch
         {
@@ -115,17 +128,18 @@ public record IntegerPacketItem() : PacketItem
         };
     }
 
-    private bool? IsOrdered(IntegerPacketItem right)
+    private int IsOrdered(IntegerPacketItem right)
     {
-        if (Value < right.Value)
-            return true;
-        if (Value > right.Value)
-            return false;
-        return null;
+        return Value.CompareTo(right.Value);
     }
 
-    private bool? IsOrdered(ListPacketItem right)
+    private int IsOrdered(ListPacketItem right)
     {
-        return new ListPacketItem(this).IsOrdered(right);
+        return new ListPacketItem(this).CompareTo(right);
+    }
+
+    public override string ToString()
+    {
+        return Value.ToString();
     }
 }
