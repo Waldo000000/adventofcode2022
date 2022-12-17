@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using AdventOfCode.Shared;
 
@@ -21,19 +22,31 @@ public static class Day14Puzzle
             .GetSandCoords()
             .Count();
     }
+
+    public static int GetFinalCountOfRestingSandWithBedrockOnceOriginBlocked(Coord sandOrigin, RockPath[] rockPaths)
+    {
+        var cave = Cave.CreateWithBedrock(rockPaths);
+
+        while (!cave.IsBlocked(sandOrigin))
+        {
+            cave.AddSand(sandOrigin);
+        }
+
+        return cave
+            .GetSandCoords()
+            .Count();
+    }
 }
 
 public class Cave
 {
     private readonly IDictionary<Coord, Material> _state;
-    private readonly IEnumerable<Coord> _rocks;
-    private int _rockBottom;
+    private readonly int? _bedrockDepth;
 
-    private Cave(Dictionary<Coord, Material> state)
+    private Cave(Dictionary<Coord, Material> state, int? bedrockDepth = null)
     {
         _state = state;
-        _rocks = GetAllCoordsOf(Material.Rock);
-        _rockBottom = _rocks.Max(rock => rock.Y);
+        _bedrockDepth = bedrockDepth;
     }
 
     public static Cave Create(RockPath[] rockPaths)
@@ -41,6 +54,17 @@ public class Cave
         var initialState = new Dictionary<Coord, Material>();
         rockPaths.ToList().ForEach(rockPath => InitializeRockPath(rockPath, initialState));
         return new Cave(initialState);
+    }
+
+    public static Cave CreateWithBedrock(RockPath[] rockPaths)
+    {
+        var initialState = new Dictionary<Coord, Material>();
+        rockPaths.ToList().ForEach(rockPath => InitializeRockPath(rockPath, initialState));
+
+        var deepestRockPath = rockPaths.SelectMany(p => p.Points).Max(p => p.Y);
+        var bedrockDepth = deepestRockPath + 2;
+
+        return new Cave(initialState, bedrockDepth);
     }
 
     private static void InitializeRockPath(RockPath rockPath, Dictionary<Coord, Material> state)
@@ -54,8 +78,8 @@ public class Cave
 
     public AddMaterialResult AddSand(Coord coord)
     {
-        if (_state.ContainsKey(coord))
-            throw new InvalidOperationException($"Cannot add sand where {_state[coord]} already exists");
+        if (GetMaterialAt(coord) is not null)
+            throw new InvalidOperationException($"Cannot add sand where {GetMaterialAt(coord)} already exists");
 
         var restingPlace = FindRestingPlaceForSandFrom(coord);
         if (restingPlace == null)
@@ -69,7 +93,7 @@ public class Cave
     {
         var nextCoord = GetNextSandCoord(coord);
 
-        if (nextCoord == null)
+        if (nextCoord == null) // nowhere to go, so is already at rest
             return coord;
 
         return IsInTheAbyss(nextCoord)
@@ -79,10 +103,10 @@ public class Cave
 
     public IEnumerable<Coord> GetSandCoords()
     {
-        return GetAllCoordsOf(Material.Sand);
+        return GetKnownCoordsOf(Material.Sand);
     }
 
-    private IEnumerable<Coord> GetAllCoordsOf(Material material)
+    private IEnumerable<Coord> GetKnownCoordsOf(Material material)
     {
         return _state
             .Where(kv => kv.Value == material)
@@ -91,7 +115,8 @@ public class Cave
 
     private bool IsInTheAbyss(Coord nextCoord)
     {
-        return nextCoord.Y > _rockBottom;
+        return nextCoord.Y > (_bedrockDepth ?? int.MinValue) &&
+               nextCoord.Y > GetKnownCoordsOf(Material.Rock).Max(rock => rock.Y);
     }
 
     private Coord? GetNextSandCoord(Coord coord)
@@ -102,13 +127,14 @@ public class Cave
             coord.Moved(Direction.Down).Moved(Direction.Left),
             coord.Moved(Direction.Down).Moved(Direction.Right)
         };
-        return destinationsToTry.FirstOrDefault(destination => !_state.ContainsKey(destination));
+        return destinationsToTry.FirstOrDefault(destination => GetMaterialAt(destination) == null);
     }
 
     public override string ToString()
     {
-        var (yMin, yMax) = (_rocks.Min(c => c.Y) - 5, _rocks.Max(c => c.Y) + 5);
-        var (xMin, xMax) = (_rocks.Min(c => c.X) - 5, _rocks.Max(c => c.X) + 5);
+        IEnumerable<Coord> rocks = GetKnownCoordsOf(Material.Rock).ToArray();
+        var (yMin, yMax) = (rocks.Min(c => c.Y) - 5, rocks.Max(c => c.Y) + 5);
+        var (xMin, xMax) = (rocks.Min(c => c.X) - 5, rocks.Max(c => c.X) + 5);
         return string.Join("\n",
             Enumerable.Range(yMin, yMax).Select(y =>
                 string.Join("", Enumerable.Range(xMin, xMax).Select(x => GetSprite(new Coord(x, y))))));
@@ -116,13 +142,12 @@ public class Cave
 
     private char GetSprite(Coord coord)
     {
-        if (!_state.ContainsKey(coord))
-            return '.';
-        return _state[coord] switch
+        return GetMaterialAt(coord) switch
         {
             Material.Rock => '#',
             Material.Sand => 'o',
-            _ => throw new ArgumentOutOfRangeException(nameof(Material), _state[coord], null)
+            null => '.',
+            _ => throw new ArgumentOutOfRangeException(nameof(Material), GetMaterialAt(coord), null)
         };
     }
 
@@ -130,6 +155,17 @@ public class Cave
     {
         Rock,
         Sand
+    }
+
+    public bool IsBlocked(Coord coord)
+    {
+        return GetMaterialAt(coord) is not null;
+    }
+
+    private Material? GetMaterialAt(Coord coord)
+    {
+        return coord.Y == _bedrockDepth ? Material.Rock
+            : _state.ContainsKey(coord) ? _state[coord] : null;
     }
 }
 

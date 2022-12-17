@@ -29,6 +29,26 @@ public class Day14Tests
         Day14Puzzle.GetFinalCountOfRestingSand(sandOrigin, rockPaths).Should().Be(665);
     }
 
+    [Test]
+    public void GetFinalCountOfRestingSand_WithBedrockAndWithSampleData_ReturnsExpectedValue()
+    {
+        var rockPaths = ReadRockPaths("Day14\\Part1.sample.txt").ToArray();
+
+        var sandOrigin = new Coord(500, 0);
+
+        Day14Puzzle.GetFinalCountOfRestingSandWithBedrockOnceOriginBlocked(sandOrigin, rockPaths).Should().Be(93);
+    }
+
+    [Test]
+    public void GetFinalCountOfRestingSand_WithBedrockAndWithRealData_ReturnsExpectedValue()
+    {
+        var rockPaths = ReadRockPaths("Day14\\Part1.real.txt").ToArray();
+
+        var sandOrigin = new Coord(500, 0);
+
+        Day14Puzzle.GetFinalCountOfRestingSandWithBedrockOnceOriginBlocked(sandOrigin, rockPaths).Should().Be(25434);
+    }
+
     private RockPath[] ReadRockPaths(string filename)
     {
         return File.ReadAllLines(filename)
