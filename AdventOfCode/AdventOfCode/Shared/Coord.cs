@@ -1,8 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace AdventOfCode.Shared;
 
-public record Coord(int X, int Y);
+/// <param name="X">Distance to the right</param>
+/// <param name="Y">Distance down</param>
+public record Coord(int X, int Y)
+{
+    public override string ToString()
+    {
+        return string.Concat("(", X, ",", Y, ")");
+    }
+};
 
 public static class CoordExtensions
 {
@@ -10,18 +20,12 @@ public static class CoordExtensions
     {
         return direction switch
         {
-            Direction.Up => coord with {Y = coord.Y + 1},
-            Direction.Down => coord with {Y = coord.Y - 1},
+            Direction.Up => coord with {Y = coord.Y - 1},
+            Direction.Down => coord with {Y = coord.Y + 1},
             Direction.Left => coord with {X = coord.X - 1},
             Direction.Right => coord with {X = coord.X + 1},
             _ => throw new ArgumentOutOfRangeException($"Unrecognized direction {direction}")
         };
-    }
-
-    public static bool IsAdjacent(this Coord firstCoord, Coord secondCoord)
-    {
-        return Math.Abs(firstCoord.X - secondCoord.X) <= 1 &&
-               Math.Abs(firstCoord.Y - secondCoord.Y) <= 1;
     }
 
     public static bool IsXAdjacent(this Coord fromCoord, Coord toCoord)
@@ -34,23 +38,18 @@ public static class CoordExtensions
         return Math.Abs(fromCoord.Y - toCoord.Y) <= 1;
     }
 
-    public static Direction? GetXDirection(this Coord fromCoord, Coord toCoord)
+    /// <summary>
+    /// Returns all intermediary coords (inclusive of ends) in a straight horizontal or vertical line 
+    /// </summary>
+    public static IEnumerable<Coord> StraightLineTo(this Coord source, Coord destination)
     {
-        var xDelta = toCoord.X - fromCoord.X;
-        if (xDelta < 0)
-            return Direction.Left;
-        if (xDelta > 0)
-            return Direction.Right;
-        return null;
-    }
+        if (source.X == destination.X)
+            return source.Y.RangeUntil(destination.Y).Select(y => source with {Y = y});
 
-    public static Direction? GetYDirection(this Coord fromCoord, Coord toCoord)
-    {
-        var yDelta = toCoord.Y - fromCoord.Y;
-        if (yDelta < 0)
-            return Direction.Down;
-        if (yDelta > 0)
-            return Direction.Up;
-        return null;
+        if (source.Y == destination.Y)
+            return source.X.RangeUntil(destination.X).Select(x => source with {X = x});
+
+        throw new InvalidOperationException(
+            $"Cannot calculate intermediary coords between coords that are neither in the same horizontal nor vertical plane ({source} and {destination})");
     }
 }

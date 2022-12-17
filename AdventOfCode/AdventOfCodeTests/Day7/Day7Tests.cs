@@ -43,7 +43,7 @@ public class Day7Tests
     public void GetSizeOfSmallestDirectoryBigEnoughToFreeSpace_WithMaxUsedAfterDelete40000000AndRealData_ReturnsExpectedResult()
     {
         var terminalOutput = ParseTerminalOutput("Day7\\Part1.real.txt").ToArray();
-        Day7Puzzle.GetSizeOfSmallestDirectoryBigEnoughToFreeSpace(terminalOutput, 40000000).Should().Be(-1);
+        Day7Puzzle.GetSizeOfSmallestDirectoryBigEnoughToFreeSpace(terminalOutput, 40000000).Should().Be(366028);
     }
 
     private static IEnumerable<Command> ParseTerminalOutput(string filename)
