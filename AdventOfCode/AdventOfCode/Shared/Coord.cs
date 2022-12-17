@@ -53,11 +53,6 @@ public static class CoordExtensions
             $"Cannot calculate intermediary coords between coords that are neither in the same horizontal nor vertical plane ({source} and {destination})");
     }
 
-    public static bool InRow(this Coord coord, int y)
-    {
-        return coord.Y == y;
-    }
-
     public static int GetManhattanDistanceTo(this Coord coord, Coord destination)
     {
         return Math.Abs(destination.Y - coord.Y) + Math.Abs(destination.X - coord.X);

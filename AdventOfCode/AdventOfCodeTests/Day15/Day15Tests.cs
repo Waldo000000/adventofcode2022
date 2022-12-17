@@ -26,7 +26,7 @@ public class Day15Tests
     {
         var sensorReports = ReadSensorReports("Day15\\Part1.real.txt").ToArray();
 
-        Day15Puzzle.GetNumPositionsCannotContainBeaconInRow(2000000, sensorReports).Should().Be(-1);
+        Day15Puzzle.GetNumPositionsCannotContainBeaconInRow(2000000, sensorReports).Should().Be(5040643);
     }
 
     private SensorReport[] ReadSensorReports(string filename)
