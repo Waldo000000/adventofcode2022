@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -14,19 +15,35 @@ public class Day15Tests
         new Regex(@"Sensor at x=([-\d]+), y=([-\d]+): closest beacon is at x=([-\d]+), y=([-\d]+)");
 
     [Test]
-    public void GetNumPositionsCannotContainBeaconInRow_WithSampleData_ReturnsExpectedValue()
+    public void GetNumPositionsCannotContainKnownBeaconInRow_WithSampleData_ReturnsExpectedValue()
     {
         var sensorReports = ReadSensorReports("Day15\\Part1.sample.txt").ToArray();
 
-        Day15Puzzle.GetNumPositionsCannotContainBeaconInRow(10, sensorReports).Should().Be(26);
+        Day15Puzzle.GetNumPositionsCannotContainKnownBeaconInRow(10, sensorReports).Should().Be(26);
     }
     
     [Test]
-    public void GetNumPositionsCannotContainBeaconInRow_WithRealData_ReturnsExpectedValue()
+    public void GetNumPositionsCannotContainKnownBeaconInRow_WithRealData_ReturnsExpectedValue()
     {
         var sensorReports = ReadSensorReports("Day15\\Part1.real.txt").ToArray();
 
-        Day15Puzzle.GetNumPositionsCannotContainBeaconInRow(2000000, sensorReports).Should().Be(5040643);
+        Day15Puzzle.GetNumPositionsCannotContainKnownBeaconInRow(2000000, sensorReports).Should().Be(5040643);
+    }
+
+    [Test]
+    public void GetDistressBeaconTuningFrequency_WithSampleData_ReturnsExpectedValue()
+    {
+        var sensorReports = ReadSensorReports("Day15\\Part1.sample.txt").ToArray();
+
+        Day15Puzzle.GetDistressBeaconTuningFrequency(20, sensorReports).Should().Be(56000011);
+    }
+    
+    [Test]
+    public void GetDistressBeaconTuningFrequency_WithRealData_ReturnsExpectedValue()
+    {
+        var sensorReports = ReadSensorReports("Day15\\Part1.real.txt").ToArray();
+
+        var result = Day15Puzzle.GetDistressBeaconTuningFrequency(4000000, sensorReports);
     }
 
     private SensorReport[] ReadSensorReports(string filename)
