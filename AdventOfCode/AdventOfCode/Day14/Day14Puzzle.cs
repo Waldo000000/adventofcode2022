@@ -11,8 +11,10 @@ public static class Day14Puzzle
     {
         var cave = Cave.Create(rockPaths);
 
+        //var i = 0;
         while (cave.AddSand(sandOrigin) is not LostToTheAbyssAddMaterialResult)
         {
+            //File.WriteAllText($"tmp.cave.{(i++):0000}.txt", cave.ToString());
         }
 
         return cave
@@ -24,10 +26,14 @@ public static class Day14Puzzle
 public class Cave
 {
     private readonly IDictionary<Coord, Material> _state;
+    private readonly IEnumerable<Coord> _rocks;
+    private int _rockBottom;
 
     private Cave(Dictionary<Coord, Material> state)
     {
         _state = state;
+        _rocks = GetAllCoordsOf(Material.Rock);
+        _rockBottom = _rocks.Max(rock => rock.Y);
     }
 
     public static Cave Create(RockPath[] rockPaths)
@@ -85,8 +91,7 @@ public class Cave
 
     private bool IsInTheAbyss(Coord nextCoord)
     {
-        var rockBottom = GetAllCoordsOf(Material.Rock).Max(rock => rock.Y);
-        return nextCoord.Y > rockBottom;
+        return nextCoord.Y > _rockBottom;
     }
 
     private Coord? GetNextSandCoord(Coord coord)
@@ -98,6 +103,27 @@ public class Cave
             coord.Moved(Direction.Down).Moved(Direction.Right)
         };
         return destinationsToTry.FirstOrDefault(destination => !_state.ContainsKey(destination));
+    }
+
+    public override string ToString()
+    {
+        var (yMin, yMax) = (_rocks.Min(c => c.Y) - 5, _rocks.Max(c => c.Y) + 5);
+        var (xMin, xMax) = (_rocks.Min(c => c.X) - 5, _rocks.Max(c => c.X) + 5);
+        return string.Join("\n",
+            Enumerable.Range(yMin, yMax).Select(y =>
+                string.Join("", Enumerable.Range(xMin, xMax).Select(x => GetSprite(new Coord(x, y))))));
+    }
+
+    private char GetSprite(Coord coord)
+    {
+        if (!_state.ContainsKey(coord))
+            return '.';
+        return _state[coord] switch
+        {
+            Material.Rock => '#',
+            Material.Sand => 'o',
+            _ => throw new ArgumentOutOfRangeException(nameof(Material), _state[coord], null)
+        };
     }
 
     private enum Material
