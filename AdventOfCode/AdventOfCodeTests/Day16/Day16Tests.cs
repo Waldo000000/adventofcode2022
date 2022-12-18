@@ -15,14 +15,28 @@ public class Day16Tests
     public void GetMaxPressureReleaseWithinMinutes_WithSampleData_ReturnsExpectedValue()
     {
         var valves = ReadValves("Day16\\Part1.sample.txt").ToDictionary(v => v.Id);
-        Day16Puzzle.GetMaxPressureReleaseWithinMinutes(30, "AA", valves).Should().Be(1651);
+        Day16Puzzle.GetMaxPressureReleaseWithinMinutes(30, "AA", valves, 1).Should().Be(1651);
     }
 
     [Test]
     public void GetMaxPressureReleaseWithinMinutes_WithRealData_ReturnsExpectedValue()
     {
         var valves = ReadValves("Day16\\Part1.real.txt").ToDictionary(v => v.Id);
-        Day16Puzzle.GetMaxPressureReleaseWithinMinutes(30, "AA", valves).Should().Be(2181);
+        Day16Puzzle.GetMaxPressureReleaseWithinMinutes(30, "AA", valves, 1).Should().Be(2181);
+    }
+
+    [Test]
+    public void GetMaxPressureReleaseWithinMinutesWithTwoActors_WithSampleData_ReturnsExpectedValue()
+    {
+        var valves = ReadValves("Day16\\Part1.sample.txt").ToDictionary(v => v.Id);
+        Day16Puzzle.GetMaxPressureReleaseWithinMinutes(26, "AA", valves, 2).Should().Be(1707);
+    }
+
+    [Test]
+    public void GetMaxPressureReleaseWithinMinutesWithTwoActors_WithRealData_ReturnsExpectedValue()
+    {
+        var valves = ReadValves("Day16\\Part1.real.txt").ToDictionary(v => v.Id);
+        Day16Puzzle.GetMaxPressureReleaseWithinMinutes(26, "AA", valves, 2).Should().Be(2824);
     }
 
     private Valve[] ReadValves(string filename)
