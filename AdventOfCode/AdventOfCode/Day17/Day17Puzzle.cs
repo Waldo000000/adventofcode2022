@@ -14,6 +14,7 @@ public static class Day17Puzzle
         {
             chamber.AddRock();
         }
+
         return chamber.TowerHeight;
     }
 }
@@ -27,10 +28,14 @@ public enum JetPush
 // Note: Bottom of chamber is y=0; above chamber is y=[-ve]
 public class Chamber
 {
+    public const int ChamberWidth = 7;
+
     private readonly HashSet<Coord> _fallenRocks = new();
     private readonly RockPattern _rockPattern = new();
 
     private readonly JetPushPattern _jetPushPattern;
+    private long _towerHeight;
+
 
     public Chamber(JetPushPattern jetPushPattern)
     {
@@ -50,7 +55,49 @@ public class Chamber
             rock = fallen;
         }
 
-        rock.Coords.ToList().ForEach(coord => _fallenRocks.Add(coord));
+        UpdateTower(rock);
+    }
+
+    private void UpdateTower(Rock fallenRock)
+    {
+        UpdateTowerRocks(fallenRock);
+        UpdateTowerHeight(fallenRock);
+        PruneTower(fallenRock);
+    }
+
+    private void UpdateTowerRocks(Rock fallenRock)
+    {
+        fallenRock.Coords.ToList().ForEach(coord => _fallenRocks.Add(coord));
+    }
+
+    private void UpdateTowerHeight(Rock fallenRock)
+    {
+        // TODO: longcoord
+        _towerHeight = fallenRock.Coords.Select(c => (long) Math.Abs(c.Y)).Append(_towerHeight).Max();
+    }
+
+    /// <summary>
+    /// Optimization: Check the top rows (down to wherever the most recent rock fell) for any 2 adjacent rows that have
+    /// at least one fallen rock in every column. Prune all rocks below, because no future rock will ever reach them.   
+    /// </summary>
+    /// <param name="fallenRock"></param>
+    private void PruneTower(Rock fallenRock)
+    {
+        var fallenRockBottom = fallenRock.Coords.MaxBy(c => c.Y)!.Y; // Max because Y increases downwards
+
+        // TODO: longcoord
+        for (int y1 = (int) (_towerHeight * -1); y1 < fallenRockBottom; y1++)
+        {
+            var y2 = y1 + 1;
+            var canPruneBeyondY2 = Enumerable
+                .Range(1, ChamberWidth)
+                .All(x => _fallenRocks.Contains(new Coord(x, y1)) || _fallenRocks.Contains(new Coord(x, y2)));
+
+            if (canPruneBeyondY2)
+            {
+                _fallenRocks.RemoveWhere(c => c.Y > y2);
+            }
+        }
     }
 
     private Rock Fall(Rock rock)
@@ -58,9 +105,7 @@ public class Chamber
         return IsAtRest(rock) ? rock : MoveDown(rock);
     }
 
-    public int TowerHeight => _fallenRocks.Any()
-        ? _fallenRocks.Max(r => Math.Abs(r.Y))
-        : 0;
+    public long TowerHeight => _towerHeight;
 
     private Rock SpawnRock(Rock rockPattern)
     {
@@ -72,7 +117,9 @@ public class Chamber
         return new Rock(coords.ToArray());
     }
 
-    private Coord GetSpawnOrigin() => new(3, -1 * (TowerHeight + 4));
+    // TODO: longcoord
+    private Coord GetSpawnOrigin() => new(3, -1 * ((int) TowerHeight + 4));
+
 
     private static Rock MoveDown(Rock rock)
     {
@@ -102,7 +149,7 @@ public class Chamber
 
     private bool IsWall(Coord coord)
     {
-        return coord.X == 0 || coord.X == 8;
+        return coord.X == 0 || coord.X == (ChamberWidth + 1);
     }
 
     private static bool IsFloor(Coord coord)
@@ -112,13 +159,14 @@ public class Chamber
 
     public override string ToString()
     {
-        return string.Join("\n", Enumerable.Range(0, TowerHeight + 8).Select(y => -1 * y).Reverse().Select(y =>
+        // TODO: longcoord
+        return string.Join("\n", Enumerable.Range(0, (int) TowerHeight + 8).Select(y => -1 * y).Reverse().Select(y =>
             string.Join("",
-                Enumerable.Range(0, 9).Select(x =>
+                Enumerable.Range(0, ChamberWidth + 2).Select(x =>
                 {
-                    if (y == 0 && (x == 0 || x == 8))
+                    if (y == 0 && (x == 0 || x == ChamberWidth + 1))
                         return "+";
-                    if (x == 0 || x == 8)
+                    if (x == 0 || x == ChamberWidth + 1)
                         return "|";
                     if (y == 0)
                         return "-";
