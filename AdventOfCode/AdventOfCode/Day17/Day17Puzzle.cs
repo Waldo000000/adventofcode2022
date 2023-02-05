@@ -7,10 +7,13 @@ namespace AdventOfCode.Day17;
 
 public static class Day17Puzzle
 {
-    public static int GetTowerHeightAfterNumRocksFallen(int numRocksFallen, JetPushPattern jetPattern)
+    public static long GetTowerHeightAfterNumRocksFallen(long numRocksFallen, JetPushPattern jetPattern)
     {
         var chamber = new Chamber(jetPattern);
-        Enumerable.Range(0, numRocksFallen).ToList().ForEach(_ => chamber.AddRock());
+        for (long i = 0; i < numRocksFallen; i++)
+        {
+            chamber.AddRock();
+        }
         return chamber.TowerHeight;
     }
 }

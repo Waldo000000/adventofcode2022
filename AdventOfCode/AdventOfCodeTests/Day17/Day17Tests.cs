@@ -25,6 +25,22 @@ public class Day17Tests
         Day17Puzzle.GetTowerHeightAfterNumRocksFallen(2022, jetPushPattern).Should().Be(3232);
     }
     
+    [Test]
+    public void GetTowerHeightAfterNumRocksFallen_WithLargeTowerWithSampleData_ReturnsExpectedValue()
+    {
+        var jetPushPattern = ReadJetPattern("Day17\\Part1.sample.txt");
+
+        Day17Puzzle.GetTowerHeightAfterNumRocksFallen(1000000000000L, jetPushPattern).Should().Be(1514285714288L);
+    }
+    
+    [Test]
+    public void GetTowerHeightAfterNumRocksFallen_WithLargeTowerWithRealData_ReturnsExpectedValue()
+    {
+        var jetPushPattern = ReadJetPattern("Day17\\Part1.real.txt");
+
+        Day17Puzzle.GetTowerHeightAfterNumRocksFallen(1000000000000L, jetPushPattern).Should().Be(-1);
+    }
+
     private JetPushPattern ReadJetPattern(string filename)
     {
         var jetPushes = File.ReadLines(filename).Single().ToCharArray().Select(ReadJetPush).ToArray();
