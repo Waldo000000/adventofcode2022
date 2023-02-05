@@ -28,7 +28,7 @@ public enum JetPush
 // Note: Bottom of chamber is y=0; above chamber is y=[-ve]
 public class Chamber
 {
-    public const int ChamberWidth = 7;
+    private const int ChamberWidth = 7;
 
     private readonly HashSet<Coord> _fallenRocks = new();
     private readonly RockPattern _rockPattern = new();
@@ -142,9 +142,9 @@ public class Chamber
 
     private bool IsCollision(Coord coord)
     {
-        return _fallenRocks.Contains(coord)
-               || IsFloor(coord)
-               || IsWall(coord);
+        return IsWall(coord) ||
+               _fallenRocks.Contains(coord) ||
+               IsFloor(coord);
     }
 
     private bool IsWall(Coord coord)
